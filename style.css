@@ -1,0 +1,21 @@
+body {
+  background-color: white;
+  font-family: "Open Sans", sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+.about-text {
+  text-align: justify;
+  background-color: #bcd9eb;
+  padding: 50px 50px 50px 50px;
+  border-radius: 20%;
+}
+
+.row:first-child .btn {
+  margin-bottom: 10px; /* Change the value to adjust the space */
+}
+
