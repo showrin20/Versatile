@@ -47,23 +47,16 @@ Versatile is an all-encompassing SaaS platform designed to simplify and enrich e
 - To-do lists and task management for personal and professional use.
 - Collaboration tools for small teams.
 
-### Educational and Learning Resources
-- Access to online educational resources and language tools.
+### Technology Stack
 
-### Emergency Toolkit
-- Essential information for emergencies, including first aid tips and contact info.
+Versatile is built on a robust and modern technology stack to ensure high performance, scalability, and ease of maintenance:
 
-### Family Management Features
-- Manages family schedules, activities, and appointments.
+- **Frontend:** 
+  - React
 
-### Customization and Integration
-- Integrates with popular apps and services.
-- Customizable interface to suit user preferences.
-
-### Data Security and Privacy
-- High-level encryption and security protocols to protect user data.
-
-### Cross-Platform Accessibility
-- Available on both mobile and desktop platforms.
-
-
+- **Backend:**
+  - Node.js
+  - Express
+  
+- **Database:**
+  - MongoDB
