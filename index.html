@@ -1,144 +1,139 @@
+<!DOCTYPE html>
 <html lang="en">
- <head>
-  <meta charset="utf-8"/>
-  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
-  <script src="https://cdn.tailwindcss.com">
-  </script>
-  <title>
-   Versatile
-  </title>
- </head>
- <body class="bg-gray-100 text-gray-800">
-  <header class="bg-white shadow">
-   <nav class="container mx-auto p-4 flex justify-between items-center">
-    <a class="text-2xl font-bold text-blue-500" href="#">
-     Versatile
-    </a>
-    <button class="lg:hidden text-gray-500 focus:outline-none">
-     <i class="fas fa-bars">
-     </i>
-    </button>
-    <ul class="hidden lg:flex space-x-6">
-     <li>
-      <a class="hover:text-blue-500" href="index.html">
-       Home
-      </a>
-     </li>
-     <li>
-      <a class="hover:text-blue-500" href="#About">
-       About
-      </a>
-     </li>
-     <li>
-      <a class="hover:text-blue-500" href="#calculator">
-       Calculators
-      </a>
-     </li>
-     <li>
-      <a class="hover:text-blue-500" href="#textutils">
-       TextUtils
-      </a>
-     </li>
-     <li>
-      <a class="hover:text-blue-500" href="task_manager.html">
-       Task Manager
-      </a>
-     </li>
-     <li>
-      <a class="hover:text-blue-500" href="clock.html">
-       Clock
-      </a>
-     </li>
-     <li>
-      <a class="hover:text-blue-500" href="info_desk.html">
-       Info-Desk
-      </a>
-     </li>
-    </ul>
-    <a class="hidden lg:block" href="index.html">
-     <img alt="Versatile logo with a dynamic and modern design" class="w-30" height="60" src="https://storage.googleapis.com/a1aa/image/ce6G9pfnwCjzLkOinj9mK8YgNOt0tMjfbJ1hLOa4BI6Jf4cQB.jpg" width="120"/>
-    </a>
-   </nav>
-  </header>
-  <section class="py-12 bg-gray-50" id="About">
-   <div class="container mx-auto text-center">
-    <img alt="Illustration of a person working on a laptop with various tools around them" class="mx-auto mb-8" height="400" src="https://storage.googleapis.com/a1aa/image/SMQUeVWf8Bv2tkj98EH7lm3vrjhJzDu6dOrs1UotOZjlPOHUA.jpg" width="700"/>
-    <p class="text-lg leading-relaxed">
-     Welcome to Versatile, the ultimate online toolset for all your daily
-          needs! Developed by Showrin Rahman, Versatile offers a wide range of
-          versatile tools that will make your life easier. With our powerful and
-          intuitive calculators, text editors, stopwatch timers, news and
-          Wikipedia search bars, and more, you'll have everything you need to
-          stay organized, informed, and efficient. Whether you're a student,
-          professional, or just someone who loves to be prepared, Versatile is
-          the perfect companion for your busy life. So why wait? Start using
-          Versatile today and unlock your full potential.
-    </p>
-   </div>
-  </section>
-  <section class="py-12" id="calculator">
-   <div class="container mx-auto">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-     <div class="text-center">
-      <img alt="Illustration of a calculator with various mathematical symbols" class="mx-auto mb-4" height="300" src="https://storage.googleapis.com/a1aa/image/bPtmvtyyzPrzL9eKvwExFFJGvfWOKaWTRnsniHIrqW0iPOHUA.jpg" width="400"/>
-      <h3 class="text-xl font-semibold mb-4">
-       Choose Your Calculator
-      </h3>
-      <div class="space-y-4">
-       <button class="w-40 py-2 bg-yellow-400 text-white rounded">
-        Simple Calculator
-       </button>
-       <button class="w-40 py-2 bg-teal-400 text-white rounded">
-        Age Calculator
-       </button>
-       <button class="w-40 py-2 bg-purple-400 text-white rounded">
-        CGPA Calculator
-       </button>
-       <button class="w-40 py-2 bg-teal-600 text-white rounded">
-        Unit Converter
-       </button>
-       <button class="w-40 py-2 bg-blue-900 text-white rounded">
-        Temperature
-       </button>
-       <button class="w-40 py-2 bg-pink-300 text-white rounded">
-        Currency Converter
-       </button>
-      </div>
-     </div>
-     <div class="text-center">
-      <img alt="Illustration of a person multitasking with various tools and gadgets" class="mx-auto mb-4" height="300" src="https://storage.googleapis.com/a1aa/image/VOe89JrVs0SwdKwCqE81fCIVoefe7mTxLU9M0N9h7DYY8x5gC.jpg" width="400"/>
-     </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+
+
+
+    <link rel="stylesheet" href="style.css" />
+    <title>Versatile</title>
+  </head>
+  <body>
+   
+    <div class="header">
+         
+      <nav class="navbar navbar-expand-lg navbar-light  navigation">
+        <div class="container">
+          <a class="navbar-brand" href="#" style="color: #699cc7; font-size:30px">
+            Versatile
+          </a>          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="mx-auto navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html">Home</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#About">About</a>
+                </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#calculator">Calculators </a>
+              </li>
+
+              <li class="nav-item">
+                <a class="nav-link" href="#textutils">TextUtils</a>
+              </li>
+
+              <li class="nav-item">
+                <a class="nav-link" href="task_manger.html">Task Manager</a>
+              </li>
+     <li class="nav-item">
+                <a class="nav-link" href="drawing.html">Clock</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="drawing.html">Info-Desk</a>
+              </li>
+  
+  
+            </ul>
+                      <a class="navbar-brand" href="index.html"><img src="images/logo2.gif" width="120px"></a>
+              
+
+  
+          </div>
+        </div>
+      </nav>
+    </nav>
+
+
+    <section class="About">
+      <div id="About">
+              <div class="container">
+  <!-- <div class="row justify-content-center">
+    <div class="col-md-12"> -->
+      <div class="row justify-content-center">
+      <img src="images/work.gif" class="img-fluid" style="width: 700px" alt="Your Image">
     </div>
-   </div>
-  </section>
-  <section class="py-12 bg-gray-50" id="textutils">
-   <div class="container mx-auto">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-     <div class="text-center">
-      <img alt="Illustration of a person multitasking with various tools and gadgets" class="mx-auto mb-4" height="300" src="https://storage.googleapis.com/a1aa/image/VOe89JrVs0SwdKwCqE81fCIVoefe7mTxLU9M0N9h7DYY8x5gC.jpg" width="400"/>
-     </div>
-     <div class="text-center">
-      <img alt="Illustration of a person typing on a keyboard with various text-related icons around" class="mx-auto mb-4" height="300" src="https://storage.googleapis.com/a1aa/image/DhhcDcoFvA7DER8TXQeDScXE1feukoZrHeGeaMU9EGEH8x5gC.jpg" width="400"/>
-      <h3 class="text-xl font-semibold mb-4">
-       Effortlessly manipulate, analyze, and play with text - TextUtils
-              has got you covered!
-      </h3>
-      <div class="space-y-4">
-       <button class="w-40 py-2 bg-blue-400 text-white rounded">
-        Text Analysis
-       </button>
-       <button class="w-40 py-2 bg-teal-400 text-white rounded">
-        Note Taker
-       </button>
-       <button class="w-40 py-2 bg-purple-400 text-white rounded">
-        To Do List
-       </button>
-      </div>
-     </div>
+    <!-- <div class="col-md-6">
+      <p class="about-text">Welcome to Versatile, the ultimate online toolset for all your daily needs! Developed by Showrin Rahman, Versatile offers a wide range of versatile tools that will make your life easier. With our powerful and intuitive calculators, text editors, stopwatch timers, news and Wikipedia search bars, and more, you'll have everything you need to stay organized, informed, and efficient. Whether you're a student, professional, or just someone who loves to be prepared, Versatile is the perfect companion for your busy life. So why wait? Start using Versatile today and unlock your full potential</p>
+    </div> -->
     </div>
-   </div>
-  </section>
- </body>
-</html>
+
+      </div>
+
+    </section>
+
+
+    <section id="calculator">
+      
+              <div class="container"> <!--   Container start -->
+                <!-- row 1 start -->
+                <div class="row">
+                  
+                  <div class="col-md-6"> <!-- row 1 col 1 start -->
+                  <img src="images/calculator.gif" class="img-fluid"  alt="Your Image">
+                  <h3>Choose Your Calculator</h3>
+                    <button type="button"  class="btn btn-primary" style="background-color: #fbab17; border:none;width: 170px;">Simple Calculator</button>
+                    <button type="button" class="btn btn-primary" style="background-color: #69e5dd; border:none;width: 170px;">Age Calculator</button>
+                    <button type="button" class="btn btn-primary" style="background-color: #c0b9f3; border:none;width: 170px;">CGPA Calculator</button>
+              
+                    <button type="button" class="btn btn-primary" style="background-color: #1eb6af; border:none; width: 170px;">Unit Converter</button>
+                    <button type="button" class="btn btn-primary" style="background-color: #150d49; border:none; width: 170px;">Temperature</button>
+                    <button type="button" class="btn btn-primary" style="background-color: #d7baad; border:none; width: 170px;">Currency Converter</button>
+                   
+                    </div> <!-- row 1 col 1 end-->
+                    <div class="col-md-6">  <!-- row 1 col 2 start -->
+                      <img src="images/multitasking.gif" class="img-fluid"  alt="Your Image">
+                      </div> <!-- row 1 col 2 end -->
+                   </div>  <!--    row 1 end -->
+  
+              
+                </div> <!--   Container start -->
+              </section >
+  
+
+
+
+              <section id="textutils">
+      
+                <div class="container"> <!--   Container start -->
+                  <!-- row 1 start -->
+                  <div class="row">
+                    <div class="col-md-6">  <!-- row 1 col 2 start -->
+                      <img src="images/multitasking.gif" class="img-fluid"  alt="Your Image">
+                      </div> <!-- row 1 col 2 end -->
+                    
+                    <div class="col-md-6"> <!-- row 1 col 1 start -->
+                    <img src="images/typing.gif" class="img-fluid"  alt="Your Image">
+                    <h3>"Effortlessly manipulate, analyze, and play with text - TextUtils has got you covered!"</h3>
+                      <button type="button"  class="btn btn-primary" style="background-color: #74a3ed; border:none;width: 170px;">Text Analysis</button>
+                      <button type="button" class="btn btn-primary" style="background-color: #69e5dd; border:none;width: 170px;">Note Taker</button>
+                      <button type="button" class="btn btn-primary" style="background-color: #c0b9f3; border:none;width: 170px;">To Do List</button>
+                
+                     
+                     
+                      </div> <!-- row 1 col 1 end-->
+                    
+                     </div>  <!--    row 1 end -->
+    
+                
+                  </div> <!--   Container start -->
+                </section >
