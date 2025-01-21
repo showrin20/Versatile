@@ -1,0 +1,177 @@
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+Versatile
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+ </head>
+ <body class="bg-gray-100 p-6">
+  <div class="max-w-5xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+   <h1 class="text-2xl font-bold mb-4">
+    Task Manager
+   </h1>
+   <div class="flex mb-4">
+    <input class="flex-grow p-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500" id="taskInput" placeholder="Enter a task" type="text"/>
+    <button class="bg-blue-500 text-white p-2 rounded-r-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500" id="addTask">
+     <i class="fas fa-plus">
+     </i>
+     Add Task
+    </button>
+   </div>
+   <h2 class="text-xl font-semibold mb-2">
+    Task List
+   </h2>
+   <div class="overflow-x-auto">
+    <table class="min-w-full bg-white">
+     <thead>
+      <tr>
+       <th class="py-2 px-4 border-b-2 border-gray-300 text-left">
+        Task
+       </th>
+       <th class="py-2 px-4 border-b-2 border-gray-300 text-left">
+        Status
+       </th>
+       <th class="py-2 px-4 border-b-2 border-gray-300 text-left">
+        Delegated To
+       </th>
+       <th class="py-2 px-4 border-b-2 border-gray-300 text-left">
+        Actions
+       </th>
+      </tr>
+     </thead>
+     <tbody id="taskList">
+     </tbody>
+    </table>
+   </div>
+   <h2 class="text-xl font-semibold mt-6 mb-2">
+    Statuses Explained
+   </h2>
+   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="bg-gray-200 p-4 rounded-lg flex flex-col items-center">
+     <img alt="Clock icon representing defer action" class="mb-2" height="100" src="https://storage.googleapis.com/a1aa/image/e7XebWQoBPuaLk6uHiieU7bMR2lY5dbL7Gj9XCs7lcLtBcOoA.jpg" width="100"/>
+     <h3 class="text-lg font-bold mb-2">
+      Defer
+     </h3>
+     <p>
+      Postpone the task to a later time.
+     </p>
+    </div>
+    <div class="bg-gray-200 p-4 rounded-lg flex flex-col items-center">
+     <img alt="Person icon representing delegate action" class="mb-2" height="100" src="https://storage.googleapis.com/a1aa/image/dxgxP1qOJeWKOCIfQ8TxuCrMEoNtevlt8PCaZTh4yDMwBcOoA.jpg" width="100"/>
+     <h3 class="text-lg font-bold mb-2">
+      Delegate
+     </h3>
+     <p>
+      Assign the task to another person.
+     </p>
+    </div>
+    <div class="bg-gray-200 p-4 rounded-lg flex flex-col items-center">
+     <img alt="Trash bin icon representing delete action" class="mb-2" height="100" src="https://storage.googleapis.com/a1aa/image/uYmz0eSs3VUDSCHol8Tl2H3xsAFHFeo01SxjvVvrDzr1AOHUA.jpg" width="100"/>
+     <h3 class="text-lg font-bold mb-2">
+      Delete
+     </h3>
+     <p>
+      Remove the task from the list.
+     </p>
+    </div>
+    <div class="bg-gray-200 p-4 rounded-lg flex flex-col items-center">
+     <img alt="Checkmark icon representing active status" class="mb-2" height="100" src="https://storage.googleapis.com/a1aa/image/keburoqkUG3Bbydqco8pmY3cq0lUgmhbBft0xUZgfeUMD4cQB.jpg" width="100"/>
+     <h3 class="text-lg font-bold mb-2">
+      Active
+     </h3>
+     <p>
+      The task is currently active and not deferred or delegated.
+     </p>
+    </div>
+   </div>
+  </div>
+  <script>
+   const taskInput = document.getElementById('taskInput');
+        const taskList = document.getElementById('taskList');
+        const addTaskButton = document.getElementById('addTask');
+
+        let tasks = [];
+
+        function renderTasks() {
+            taskList.innerHTML = '';
+            tasks.forEach((task, index) => {
+                const row = document.createElement('tr');
+
+                const taskNameCell = document.createElement('td');
+                taskNameCell.className = 'py-2 px-4 border-b border-gray-300';
+                taskNameCell.textContent = task.name;
+                row.appendChild(taskNameCell);
+
+                const statusCell = document.createElement('td');
+                statusCell.className = 'py-2 px-4 border-b border-gray-300';
+                statusCell.textContent = task.deferred ? 'Deferred' : task.delegated ? 'Delegated' : 'Active';
+                row.appendChild(statusCell);
+
+                const delegatedCell = document.createElement('td');
+                delegatedCell.className = 'py-2 px-4 border-b border-gray-300';
+                delegatedCell.textContent = task.delegated ? task.delegated : 'N/A';
+                row.appendChild(delegatedCell);
+
+                const actionsCell = document.createElement('td');
+                actionsCell.className = 'py-2 px-4 border-b border-gray-300 flex space-x-2';
+
+                const deferButton = document.createElement('button');
+                deferButton.className = 'bg-yellow-500 text-white p-2 rounded-lg hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500';
+                deferButton.innerHTML = '<i class="fas fa-clock"></i> Defer';
+                deferButton.onclick = () => deferTask(index);
+                actionsCell.appendChild(deferButton);
+
+                const delegateButton = document.createElement('button');
+                delegateButton.className = 'bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500';
+                delegateButton.innerHTML = '<i class="fas fa-user"></i> Delegate';
+                delegateButton.onclick = () => delegateTask(index);
+                actionsCell.appendChild(delegateButton);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500';
+                deleteButton.innerHTML = '<i class="fas fa-trash"></i> Delete';
+                deleteButton.onclick = () => deleteTask(index);
+                actionsCell.appendChild(deleteButton);
+
+                row.appendChild(actionsCell);
+                taskList.appendChild(row);
+            });
+        }
+
+        function addTask() {
+            const taskName = taskInput.value.trim();
+            if (taskName) {
+                tasks.push({ name: taskName, deferred: false, delegated: null });
+                taskInput.value = '';
+                renderTasks();
+            } else {
+                alert('Please enter a valid task.');
+            }
+        }
+
+        function deferTask(index) {
+            tasks[index].deferred = !tasks[index].deferred;
+            renderTasks();
+        }
+
+        function delegateTask(index) {
+            const person = prompt('Enter the name of the person to delegate this task to:');
+            if (person) {
+                tasks[index].delegated = person;
+                renderTasks();
+            }
+        }
+
+        function deleteTask(index) {
+            tasks.splice(index, 1);
+            renderTasks();
+        }
+
+        addTaskButton.addEventListener('click', addTask);
+  </script>
+ </body>
+</html>
