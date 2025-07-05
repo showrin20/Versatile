@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productivity Hub</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google API for Calendar -->
+    <script src="https://apis.google.com/js/api.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .smooth-transition {
+            transition: all 0.3s ease;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+        }
+        .output-box {
+            background-color: #F9FAFB;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+            min-height: 100px;
+        }
+        .time-block-cell {
+            min-height: 40px;
+            padding: 8px;
+            border: 1px solid #E5E7EB;
+        }
+        .time-block-cell[contenteditable]:focus {
+            outline: none;
+            border-color: #3B82F6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <a href="index.html" class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">Versatile</a>
+                <button id="nav-toggle" class="lg:hidden text-gray-600 focus:outline-none" type="button">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+                <div class="hidden lg:flex space-x-8 items-center" id="navbar-content">
+                    <ul class="flex space-x-8">
+                        <li><a href="index.html" class="text-gray-600 hover:text-blue-500 font-medium smooth-transition">Home</a></li>
+                        <li><a href="#about" class="text-gray-600 hover:text-blue-500 font-medium smooth-transition">About</a></li>
+                        <li><a href="hub.html" class="text-gray-600 hover:text-blue-500 font-medium smooth-transition">Tool Hub</a></li>
+                        <li><a href="productivity.html" class="text-gray-600 hover:text-blue-500 font-medium smooth-transition">Daily Plan</a></li>
+                    </ul>
+                </div>
+            </div>
+            <!-- Mobile Menu -->
+            <div class="hidden lg:hidden" id="mobile-menu">
+                <ul class="flex flex-col space-y-4 py-4">
+                    <li><a href="index.html" class="text-gray-600 hover:text-blue-500 font-medium smooth-transition">Home</a></li>
+                    <li><a href="#about" class="text-gray-600 hover:text-blue-500 font-medium smooth-transition">About</a></li>
+                    <li><a href="hub.html" class="text-gray-600 hover:text-blue-500 font-medium smooth-transition">Tool Hub</a></li>
+                    <li><a href="productivity.html" class="text-gray-600 hover:text-blue-500 font-medium smooth-transition">Daily Plan</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto max-w-5xl p-6">
+        <!-- Header -->
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Productivity Hub</h1>
+
+        <!-- Mood Tracker -->
+        <section class="bg-white p-6 rounded-xl shadow-lg mb-8">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Mood Tracker</h2>
+            <div id="mood-buttons" class="flex space-x-4">
+                <button data-mood="😊" class="text-3xl p-3 hover:bg-gray-100 rounded-lg smooth-transition">😊</button>
+                <button data-mood="😐" class="text-3xl p-3 hover:bg-gray-100 rounded-lg smooth-transition">😐</button>
+                <button data-mood="😢" class="text-3xl p-3 hover:bg-gray-100 rounded-lg smooth-transition">😢</button>
+                <button data-mood="😤" class="text-3xl p-3 hover:bg-gray-100 rounded-lg smooth-transition">😤</button>
+            </div>
+            <p id="mood-log" class="mt-4 text-gray-600">Select a mood to log it!</p>
+        </section>
+
+        <!-- Brain Dump -->
+        <section class="bg-white p-6 rounded-xl shadow-lg mb-8">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Brain Dump</h2>
+            <textarea id="brain-dump" class="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-blue-500" rows="5" placeholder="Jot down your thoughts..."></textarea>
+            <div class="flex space-x-4 mt-3">
+                <button id="save-brain-dump" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-blue-600 hover:to-purple-700 smooth-transition">Save Notes</button>
+                <button id="clear-brain-dump" class="bg-gradient-to-r from-red-500 to-pink-500 text-white px-6 py-2 rounded-lg hover:from-red-600 hover:to-pink-600 smooth-transition">Clear</button>
+            </div>
+            <div class="output-box">
+                <h3 class="text-lg font-medium text-gray-700 mb-2">Saved Notes</h3>
+                <p id="brain-dump-output" class="text-gray-600">No notes saved yet.</p>
+            </div>
+        </section>
+
+        <!-- Task Manager -->
+        <section class="bg-white p-6 rounded-xl shadow-lg mb-8">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Task Manager</h2>
+            <div class="flex mb-4">
+                <input id="task-input" class="flex-grow p-3 border border-gray-200 rounded-l-lg focus:ring-2 focus:ring-blue-300 focus:border-blue-500" placeholder="Enter a task" type="text"/>
+                <button id="add-task" class="bg-gradient-to-r from-green-500 to-teal-500 text-white p-3 rounded-r-lg hover:from-green-600 hover:to-teal-600 smooth-transition">
+                    <i class="fas fa-plus"></i> Add Task
+                </button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white rounded-lg">
+                    <thead>
+                        <tr>
+                            <th class="py-3 px-4 border-b-2 border-gray-200 text-left text-gray-700">Task</th>
+                            <th class="py-3 px-4 border-b-2 border-gray-200 text-left text-gray-700">Status</th>
+                            <th class="py-3 px-4 border-b-2 border-gray-200 text-left text-gray-700">Delegated To</th>
+                            <th class="py-3 px-4 border-b-2 border-gray-200 text-left text-gray-700">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="task-list"></tbody>
+                </table>
+            </div>
+            <h2 class="text-2xl font-semibold mt-6 mb-4">Statuses Explained</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-gray-100 p-4 rounded-lg flex flex-col items-center">
+                    <i class="fas fa-clock text-4xl mb-2 text-blue-500"></i>
+                    <h3 class="text-lg font-bold mb-2">Defer</h3>
+                    <p class="text-gray-600 text-center">Postpone the task to a later time.</p>
+                </div>
+                <div class="bg-gray-100 p-4 rounded-lg flex flex-col items-center">
+                    <i class="fas fa-user text-4xl mb-2 text-green-500"></i>
+                    <h3 class="text-lg font-bold mb-2">Delegate</h3>
+                    <p class="text-gray-600 text-center">Assign the task to another person.</p>
+                </div>
+                <div class="bg-gray-100 p-4 rounded-lg flex flex-col items-center">
+                    <i class="fas fa-trash text-4xl mb-2 text-red-500"></i>
+                    <h3 class="text-lg font-bold mb-2">Delete</h3>
+                    <p class="text-gray-600 text-center">Remove the task from the list.</p>
+                </div>
+                <div class="bg-gray-100 p-4 rounded-lg flex flex-col items-center">
+                    <i class="fas fa-check text-4xl mb-2 text-teal-500"></i>
+                    <h3 class="text-lg font-bold mb-2">Active</h3>
+                    <p class="text-gray-600 text-center">The task is currently active.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Time Block Planning -->
+        <section class="bg-white p-6 rounded-xl shadow-lg mb-8">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Time Block Planning</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white rounded-lg">
+                    <thead>
+                        <tr>
+                            <th class="py-3 px-4 border-b-2 border-gray-200 text-left text-gray-700 w-24">Time</th>
+                            <th class="py-3 px-4 border-b-2 border-gray-200 text-left text-gray-700">Task</th>
+                        </tr>
+                    </thead>
+                    <tbody id="time-blocks"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Google Calendar Integration -->
+        <section class="bg-white p-6 rounded-xl shadow-lg">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Add Task to Google Calendar</h2>
+            <button id="auth-calendar" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-blue-600 hover:to-purple-700 smooth-transition">Authorize Google Calendar</button>
+            <p id="calendar-status" class="mt-4 text-gray-600">Click to authorize and add tasks to calendar.</p>
+        </section>
+    </div>
+
+    <script>
+        // Navbar Toggle
+        document.getElementById('nav-toggle').addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+
+        // Local Storage Handling
+        const storage = {
+            saveMood(mood) {
+                const moods = JSON.parse(localStorage.getItem('moods') || '[]');
+                moods.push({ mood, date: new Date().toISOString() });
+                localStorage.setItem('moods', JSON.stringify(moods));
+            },
+            saveBrainDump(text) {
+                localStorage.setItem('brainDump', text);
+            },
+            loadBrainDump() {
+                return localStorage.getItem('brainDump') || '';
+            },
+            saveTasks(tasks) {
+                localStorage.setItem('tasks', JSON.stringify(tasks));
+            },
+            loadTasks() {
+                return JSON.parse(localStorage.getItem('tasks') || '[]');
+            },
+            saveTimeBlock(hour, task) {
+                localStorage.setItem(`timeblock-${hour}`, task);
+            },
+            loadTimeBlock(hour) {
+                return localStorage.getItem(`timeblock-${hour}`) || '';
+            }
+        };
+
+        // Mood Tracker
+        document.querySelectorAll('#mood-buttons button').forEach(button => {
+            button.addEventListener('click', () => {
+                const mood = button.dataset.mood;
+                storage.saveMood(mood);
+                document.getElementById('mood-log').textContent = `Mood logged: ${mood} at ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+            });
+        });
+
+        // Brain Dump
+        const brainDumpTextarea = document.getElementById('brain-dump');
+        const brainDumpOutput = document.getElementById('brain-dump-output');
+        function updateBrainDumpOutput() {
+            const brainDumpText = storage.loadBrainDump();
+            brainDumpOutput.textContent = brainDumpText ? brainDumpText : 'No notes saved yet.';
+        }
+        brainDumpTextarea.value = storage.loadBrainDump();
+        document.getElementById('save-brain-dump').addEventListener('click', () => {
+            const brainDump = brainDumpTextarea.value.trim();
+            if (brainDump) {
+                storage.saveBrainDump(brainDump);
+                updateBrainDumpOutput();
+                alert('Notes saved successfully!');
+            } else {
+                alert('Please enter some notes before saving.');
+            }
+        });
+        document.getElementById('clear-brain-dump').addEventListener('click', () => {
+            if (confirm('Are you sure you want to clear your notes?')) {
+                brainDumpTextarea.value = '';
+                storage.saveBrainDump('');
+                updateBrainDumpOutput();
+                alert('Notes cleared.');
+            }
+        });
+        updateBrainDumpOutput();
+
+        // Task Manager
+        let tasks = storage.loadTasks();
+        function renderTasks() {
+            const taskList = document.getElementById('task-list');
+            taskList.innerHTML = '';
+            tasks.slice(0, 3).forEach((task, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="py-3 px-4 border-b border-gray-200">${task.name}</td>
+                    <td class="py-3 px-4 border-b border-gray-200">${task.deferred ? 'Deferred' : task.delegated ? 'Delegated' : 'Active'}</td>
+                    <td class="py-3 px-4 border-b border-gray-200">${task.delegated || 'N/A'}</td>
+                    <td class="py-3 px-4 border-b border-gray-200 flex space-x-2">
+                        <button data-index="${index}" class="add-to-calendar bg-gradient-to-r from-blue-500 to-purple-600 text-white px-3 py-1 rounded-lg hover:from-blue-600 hover:to-purple-700 smooth-transition"><i class="fas fa-calendar-plus"></i></button>
+                        <button data-index="${index}" class="defer-task bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-3 py-1 rounded-lg hover:from-yellow-600 hover:to-orange-600 smooth-transition"><i class="fas fa-clock"></i></button>
+                        <button data-index="${index}" class="delegate-task bg-gradient-to-r from-green-500 to-teal-500 text-white px-3 py-1 rounded-lg hover:from-green-600 hover:to-teal-600 smooth-transition"><i class="fas fa-user"></i></button>
+                        <button data-index="${index}" class="delete-task bg-gradient-to-r from-red-500 to-pink-500 text-white px-3 py-1 rounded-lg hover:from-red-600 hover:to-pink-600 smooth-transition"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                taskList.appendChild(row);
+            });
+        }
+
+        document.getElementById('add-task').addEventListener('click', () => {
+            const taskText = document.getElementById('task-input').value.trim();
+            if (taskText && tasks.length < 3) {
+                tasks.push({ name: taskText, deferred: false, delegated: null, id: Date.now() });
+                storage.saveTasks(tasks);
+                renderTasks();
+                document.getElementById('task-input').value = '';
+            } else if (tasks.length >= 3) {
+                alert('Maximum 3 tasks allowed.');
+            } else {
+                alert('Please enter a valid task.');
+            }
+        });
+
+        document.getElementById('task-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('add-task').click();
+            }
+        });
+
+        document.getElementById('task-list').addEventListener('click', (e) => {
+            const index = e.target.dataset.index || e.target.parentElement.dataset.index;
+            if (!index) return;
+            if (e.target.classList.contains('delete-task') || e.target.parentElement.classList.contains('delete-task')) {
+                tasks.splice(index, 1);
+                storage.saveTasks(tasks);
+                renderTasks();
+            } else if (e.target.classList.contains('defer-task') || e.target.parentElement.classList.contains('defer-task')) {
+                tasks[index].deferred = !tasks[index].deferred;
+                if (tasks[index].deferred) tasks[index].delegated = null;
+                storage.saveTasks(tasks);
+                renderTasks();
+            } else if (e.target.classList.contains('delegate-task') || e.target.parentElement.classList.contains('delegate-task')) {
+                const person = prompt('Enter the name of the person to delegate this task to:');
+                if (person) {
+                    tasks[index].delegated = person;
+                    tasks[index].deferred = false;
+                    storage.saveTasks(tasks);
+                    renderTasks();
+                }
+            } else if (e.target.classList.contains('add-to-calendar') || e.target.parentElement.classList.contains('add-to-calendar')) {
+                addToGoogleCalendar(tasks[index].name);
+            }
+        });
+
+        renderTasks();
+
+        // Time Block Planning
+        function renderTimeBlocks() {
+            const timeBlocks = document.getElementById('time-blocks');
+            timeBlocks.innerHTML = '';
+            const startHour = 8;
+            const endHour = 23.5; // Up to 23:30
+            for (let hour = startHour; hour <= endHour; hour += 0.5) {
+                const hourInt = Math.floor(hour);
+                const minutes = hour % 1 === 0 ? '00' : '30';
+                const timeStr = `${hourInt.toString().padStart(2, '0')}:${minutes}`;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="py-3 px-4 border-b border-gray-200 font-medium text-gray-700">${timeStr}</td>
+                    <td class="py-3 px-4 border-b border-gray-200">
+                        <div class="time-block-cell" contenteditable="true" data-time="${timeStr}"></div>
+                    </td>
+                `;
+                timeBlocks.appendChild(row);
+                const cell = row.querySelector('.time-block-cell');
+                cell.textContent = storage.loadTimeBlock(timeStr);
+                cell.addEventListener('input', () => {
+                    storage.saveTimeBlock(timeStr, cell.textContent);
+                });
+            }
+        }
+        renderTimeBlocks();
+
+        // Google Calendar Integration
+        // Replace with your own Google Client ID and API Key
+        const CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID';
+        const API_KEY = 'YOUR_GOOGLE_API_KEY';
+        const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
+        const SCOPES = "https://www.googleapis.com/auth/calendar.events";
+
+        function handleClientLoad() {
+            gapi.load('client:auth2', initClient);
+        }
+
+        function initClient() {
+            gapi.client.init({
+                apiKey: API_KEY,
+                clientId: CLIENT_ID,
+                discoveryDocs: DISCOVERY_DOCS,
+                scope: SCOPES
+            }).then(() => {
+                gapi.auth2.getAuthInstance().isSignedIn.listen(updateSignInStatus);
+                updateSignInStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+                document.getElementById('auth-calendar').addEventListener('click', () => {
+                    gapi.auth2.getAuthInstance().signIn();
+                });
+            }).catch(error => {
+                document.getElementById('calendar-status').textContent = 'Failed to initialize Google Calendar API. Please check your API credentials.';
+                console.error('Google API init error:', error);
+            });
+        }
+
+        function updateSignInStatus(isSignedIn) {
+            const authButton = document.getElementById('auth-calendar');
+            const status = document.getElementById('calendar-status');
+            if (isSignedIn) {
+                authButton.textContent = 'Sign Out';
+                status.textContent = 'Authorized. You can now add tasks to Google Calendar.';
+                authButton.removeEventListener('click', gapi.auth2.getAuthInstance().signIn);
+                authButton.addEventListener('click', () => gapi.auth2.getAuthInstance().signOut());
+            } else {
+                authButton.textContent = 'Authorize Google Calendar';
+                status.textContent = 'Click to authorize and add tasks to calendar.';
+                authButton.removeEventListener('click', gapi.auth2.getAuthInstance().signOut);
+                authButton.addEventListener('click', () => gapi.auth2.getAuthInstance().signIn());
+            }
+        }
+
+        function addToGoogleCalendar(taskText) {
+            if (!gapi.auth2.getAuthInstance().isSignedIn.get()) {
+                document.getElementById('calendar-status').textContent = 'Please authorize Google Calendar first.';
+                return;
+            }
+            const now = new Date();
+            const event = {
+                'summary': taskText,
+                'start': {
+                    'dateTime': now.toISOString(),
+                    'timeZone': 'UTC'
+                },
+                'end': {
+                    'dateTime': new Date(now.getTime() + 3600000).toISOString(),
+                    'timeZone': 'UTC'
+                }
+            };
+            gapi.client.calendar.events.insert({
+                'calendarId': 'primary',
+                'resource': event
+            }).then(response => {
+                document.getElementById('calendar-status').textContent = `Event created: ${taskText}`;
+            }).catch(error => {
+                document.getElementById('calendar-status').textContent = 'Failed to create event: ' + error.message;
+                console.error('Calendar event error:', error);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', handleClientLoad);
+    </script>
+</body>
+</html>
