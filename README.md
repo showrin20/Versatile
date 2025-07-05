@@ -1,6 +1,6 @@
 # ✨ Versatile — Your All-in-One Productivity Companion
 
-Versatile is not just a productivity tool — it's a *vibe*. Whether you're neurodivergent, hyper-organized, or somewhere in between, **Versatile** helps you take control of your time, tasks, and mental space with elegance and ease.
+Versatile is not just a productivity tool — it's a *vibe*. Whether you're neurodivergent, hyper-organized, or somewhere in between, **Versatile** helps you take control of your time, tasks, and mental space with elegance and ease. Its a **Vibe Coding Project**
 
 
 ## 🌟 Features
@@ -13,16 +13,6 @@ Versatile is not just a productivity tool — it's a *vibe*. Whether you're neur
 * 💾 **LocalStorage-Ready** – Save your task states without backend
 * 🛠️ **Lightweight & Fast** – Powered by Vite and optimized React structure
 * 🎯 **Clarity-Centric UI** – Designed to keep your focus where it matters
-
-
-## 🚀 Tech Stack
-
-* ⚛️ React.js
-* 🎨 TailwindCSS
-* 📦 Vite
-* 🔧 Vanilla JS for logic and interactions
-
----
 
 ## 🧠 Ideal For
 
