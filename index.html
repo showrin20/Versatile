@@ -78,18 +78,17 @@
 
     <!-- Main Content -->
     <main class="container mx-auto px-4 py-8">
-      <section id="about" class="bg-white p-6 md:p-10 rounded-2xl shadow-xl mb-10">
-        <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-6">
-          About <span class="text-indigo-600">Versatile</span>
-        </h2>
-      
-        <p class="text-gray-600 text-lg md:text-xl text-center max-w-3xl mx-auto mb-6">
-          Versatile is your all-in-one productivity companion designed to streamline your workflow and boost efficiency. Whether you're managing tasks, organizing thoughts, or staying focused, our app has you covered with powerful tools:
-        </p>
-      </section>
-      
+        <section id="about" class="bg-white p-6 md:p-10 rounded-2xl shadow-xl mb-10">
+            <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-6">
+                About <span class="text-indigo-600">Versatile</span>
+            </h2>
+            <p class="text-gray-600 text-lg md:text-xl text-center max-w-3xl mx-auto mb-6">
+                Versatile is your all-in-one productivity companion designed to streamline your workflow and boost efficiency. Whether you're managing tasks, organizing thoughts, or staying focused, our app has you covered with powerful tools:
+            </p>
+        </section>
+
         <!-- Brain Dump -->
-        <!-- <section class="bg-white p-6 rounded-xl shadow-lg mb-8">
+        <section class="bg-white p-6 rounded-xl shadow-lg mb-8">
             <h2 class="text-2xl font-semibold text-gray-800 mb-4">Brain Dump</h2>
             <textarea id="brain-dump" class="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-blue-500" rows="5" placeholder="Jot down your thoughts..."></textarea>
             <div class="flex space-x-4 mt-3">
@@ -100,7 +99,7 @@
                 <h3 class="text-lg font-medium text-gray-700 mb-2">Saved Notes</h3>
                 <p id="brain-dump-output" class="text-gray-600">No notes saved yet.</p>
             </div>
-        </section> -->
+        </section>
 
         <!-- Task Manager -->
         <section id="task-manager" class="py-8 bg-white rounded-xl shadow-lg mb-8">
@@ -118,8 +117,9 @@
                     </div>
                 </div>
             </div>
-          </section>
-    
+        </section>
+
+        <!-- Pomodoro Timer -->
         <section class="bg-white p-6 rounded-xl shadow-lg mb-8">
             <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Pomodoro Timer</h2>
             <div class="text-5xl font-mono text-center text-gray-800 mb-4" id="timer">25:00</div>
@@ -132,12 +132,12 @@
         </section>
 
         <!-- Clock -->
-        <!-- <section id="clock" class="py-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-lg mb-8">
+        <section id="clock" class="py-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-lg mb-8">
             <div class="container mx-auto px-4 text-center">
                 <h2 class="text-3xl font-bold text-white mb-6">Clock</h2>
                 <div id="current-time" class="text-5xl font-bold text-white"></div>
             </div>
-        </section> -->
+        </section>
 
         <!-- Info-Desk -->
         <section id="info-desk" class="py-8 bg-white rounded-xl shadow-lg">
@@ -150,7 +150,7 @@
                     <a href="hub.html" class="text-blue-500 hover:text-blue-600 font-medium smooth-transition">Tool Hub</a>
                     <a href="task_manager.html" class="text-blue-500 hover:text-blue-600 font-medium smooth-transition">Task Manager</a>
                     <a href="productivity.html" class="text-blue-500 hover:text-blue-600 font-medium smooth-transition">Daily Plan</a>
-                    <!-- <a href="#clock" class="text-blue-500 hover:text-blue-600 font-medium smooth-transition">Clock</a> -->
+                    <a href="#clock" class="text-blue-500 hover:text-blue-600 font-medium smooth-transition">Clock</a>
                 </div>
             </div>
         </section>
@@ -276,9 +276,6 @@
         const resetTimerBtn = document.getElementById('reset-timer');
 
         function updateTimer() {
-            const mins = Math.floor(seconds / 60);
-            const secs = seconds % 60;
-            timerDisplay.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
             if (seconds <= 0) {
                 clearInterval(timer);
                 isRunning = false;
@@ -287,17 +284,20 @@
                 timerStatus.textContent = isWork ? 'Work Session' : 'Break';
                 playSound();
                 alert(isWork ? 'Work session started!' : 'Break time!');
-                timer = setInterval(updateTimer, 1000);
-                isRunning = true;
-                timerDisplay.classList.add('timer-running');
-                timerDisplay.classList.remove('timer-paused');
+                timerDisplay.textContent = `${Math.floor(seconds / 60)}:${(seconds % 60).toString().padStart(2, '0')}`;
+                startTimerBtn.textContent = 'Start';
+                timerDisplay.classList.remove('timer-running', 'timer-paused');
+                return;
             }
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            timerDisplay.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
             seconds--;
         }
 
         function playSound() {
             const audio = new Audio('https://www.soundjay.com/buttons/beep-01a.mp3');
-            audio.play().catch(() => console.log('Audio playback failed'));
+            audio.play().catch(err => console.log('Audio playback failed:', err));
         }
 
         startTimerBtn.addEventListener('click', () => {
