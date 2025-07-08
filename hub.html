@@ -81,10 +81,10 @@
         <section class="bg-white p-6 rounded-xl shadow-lg mb-8">
             <h2 class="text-2xl font-semibold text-gray-800 mb-4">Mood Tracker</h2>
             <div id="mood-buttons" class="flex space-x-4">
-                <button data-mood="😊" class="text-3xl p-3 hover:bg-gray-100 rounded-lg smooth-transition">😊</button>
-                <button data-mood="😐" class="text-3xl p-3 hover:bg-gray-100 rounded-lg smooth-transition">😐</button>
-                <button data-mood="😢" class="text-3xl p-3 hover:bg-gray-100 rounded-lg smooth-transition">😢</button>
-                <button data-mood="😤" class="text-3xl p-3 hover:bg-gray-100 rounded-lg smooth-transition">😤</button>
+                <button data-mood="😊" class="text-3xl p-3 hover:bg-gray-100 rounded-lg smooth-transition" title="Happy">😊</button>
+                <button data-mood="😐" class="text-3xl p-3 hover:bg-gray-100 rounded-lg smooth-transition" title="Neutral">😐</button>
+                <button data-mood="😢" class="text-3xl p-3 hover:bg-gray-100 rounded-lg smooth-transition" title="Sad">😢</button>
+                <button data-mood="😤" class="text-3xl p-3 hover:bg-gray-100 rounded-lg smooth-transition" title="Frustrated">😤</button>
             </div>
             <p id="mood-log" class="mt-4 text-gray-600">Select a mood to log it!</p>
         </section>
@@ -113,16 +113,16 @@
                 </button>
             </div>
             <div class="overflow-x-auto">
-                <table class="min-w-full bg-white rounded-lg">
+                <table class="min-w-full bg-white rounded-lg" role="grid">
                     <thead>
-                        <tr>
-                            <th class="py-3 px-4 border-b-2 border-gray-200 text-left text-gray-700">Task</th>
-                            <th class="py-3 px-4 border-b-2 border-gray-200 text-left text-gray-700">Status</th>
-                            <th class="py-3 px-4 border-b-2 border-gray-200 text-left text-gray-700">Delegated To</th>
-                            <th class="py-3 px-4 border-b-2 border-gray-200 text-left text-gray-700">Actions</th>
+                        <tr role="row">
+                            <th class="py-3 px-4 border-b-2 border-gray-200 text-left text-gray-700" role="columnheader">Task</th>
+                            <th class="py-3 px-4 border-b-2 border-gray-200 text-left text-gray-700" role="columnheader">Status</th>
+                            <th class="py-3 px-4 border-b-2 border-gray-200 text-left text-gray-700" role="columnheader">Delegated To</th>
+                            <th class="py-3 px-4 border-b-2 border-gray-200 text-left text-gray-700" role="columnheader">Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="task-list"></tbody>
+                    <tbody id="task-list" role="rowgroup"></tbody>
                 </table>
             </div>
             <h2 class="text-2xl font-semibold mt-6 mb-4">Statuses Explained</h2>
@@ -134,7 +134,7 @@
                 </div>
                 <div class="bg-gray-100 p-4 rounded-lg flex flex-col items-center">
                     <i class="fas fa-user text-4xl mb-2 text-green-500"></i>
-                    <h3 class="text-lg font-bold mb-2">Delegate</h3>
+                    <h3 class="text-lg freaking-bold mb-2">Delegate</h3>
                     <p class="text-gray-600 text-center">Assign the task to another person.</p>
                 </div>
                 <div class="bg-gray-100 p-4 rounded-lg flex flex-col items-center">
@@ -154,14 +154,14 @@
         <section class="bg-white p-6 rounded-xl shadow-lg mb-8">
             <h2 class="text-2xl font-semibold text-gray-800 mb-4">Time Block Planning</h2>
             <div class="overflow-x-auto">
-                <table class="min-w-full bg-white rounded-lg">
+                <table class="min-w-full bg-white rounded:Lg" role="grid">
                     <thead>
-                        <tr>
-                            <th class="py-3 px-4 border-b-2 border-gray-200 text-left text-gray-700 w-24">Time</th>
-                            <th class="py-3 px-4 border-b-2 border-gray-200 text-left text-gray-700">Task</th>
+                        <tr role="row">
+                            <th class="py-3 px-4 border-b-2 border-gray-200 text-left text-gray-700 w-24" role="columnheader">Time</th>
+                            <th class="py-3 px-4 border-b-2 border-gray-200 text-left text-gray-700" role="columnheader">Task</th>
                         </tr>
                     </thead>
-                    <tbody id="time-blocks"></tbody>
+                    <tbody id="time-blocks" role="rowgroup"></tbody>
                 </table>
             </div>
         </section>
@@ -249,17 +249,18 @@
         function renderTasks() {
             const taskList = document.getElementById('task-list');
             taskList.innerHTML = '';
-            tasks.slice(0, 3).forEach((task, index) => {
+            tasks.forEach((task, index) => {
                 const row = document.createElement('tr');
+                row.setAttribute('role', 'row');
                 row.innerHTML = `
-                    <td class="py-3 px-4 border-b border-gray-200">${task.name}</td>
-                    <td class="py-3 px-4 border-b border-gray-200">${task.deferred ? 'Deferred' : task.delegated ? 'Delegated' : 'Active'}</td>
-                    <td class="py-3 px-4 border-b border-gray-200">${task.delegated || 'N/A'}</td>
-                    <td class="py-3 px-4 border-b border-gray-200 flex space-x-2">
-                        <button data-index="${index}" class="add-to-calendar bg-gradient-to-r from-blue-500 to-purple-600 text-white px-3 py-1 rounded-lg hover:from-blue-600 hover:to-purple-700 smooth-transition"><i class="fas fa-calendar-plus"></i></button>
-                        <button data-index="${index}" class="defer-task bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-3 py-1 rounded-lg hover:from-yellow-600 hover:to-orange-600 smooth-transition"><i class="fas fa-clock"></i></button>
-                        <button data-index="${index}" class="delegate-task bg-gradient-to-r from-green-500 to-teal-500 text-white px-3 py-1 rounded-lg hover:from-green-600 hover:to-teal-600 smooth-transition"><i class="fas fa-user"></i></button>
-                        <button data-index="${index}" class="delete-task bg-gradient-to-r from-red-500 to-pink-500 text-white px-3 py-1 rounded-lg hover:from-red-600 hover:to-pink-600 smooth-transition"><i class="fas fa-trash"></i></button>
+                    <td class="py-3 px-4 border-b border-gray-200" role="cell">${task.name}</td>
+                    <td class="py-3 px-4 border-b border-gray-200" role="cell">${task.deferred ? 'Deferred' : task.delegated ? 'Delegated' : 'Active'}</td>
+                    <td class="py-3 px-4 border-b border-gray-200" role="cell">${task.delegated || 'N/A'}</td>
+                    <td class="py-3 px-4 border-b border-gray-200 flex space-x-2" role="cell">
+                        <button data-index="${index}" class="add-to-calendar bg-gradient-to-r from-blue-500 to-purple-600 text-white px-3 py-1 rounded-lg hover:from-blue-600 hover:to-purple-700 smooth-transition" title="Add to Calendar"><i class="fas fa-calendar-plus"></i></button>
+                        <button data-index="${index}" class="defer-task bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-3 py-1 rounded-lg hover:from-yellow-600 hover:to-orange-600 smooth-transition" title="Defer Task"><i class="fas fa-clock"></i></button>
+                        <button data-index="${index}" class="delegate-task bg-gradient-to-r from-green-500 to-teal-500 text-white px-3 py-1 rounded-lg hover:from-green-600 hover:to-teal-600 smooth-transition" title="Delegate Task"><i class="fas fa-user"></i></button>
+                        <button data-index="${index}" class="delete-task bg-gradient-to-r from-red-500 to-pink-500 text-white px-3 py-1 rounded-lg hover:from-red-600 hover:to-pink-600 smooth-transition" title="Delete Task"><i class="fas fa-trash"></i></button>
                     </td>
                 `;
                 taskList.appendChild(row);
@@ -268,13 +269,15 @@
 
         document.getElementById('add-task').addEventListener('click', () => {
             const taskText = document.getElementById('task-input').value.trim();
-            if (taskText && tasks.length < 3) {
+            if (taskText) {
+                if (tasks.some(task => task.name.toLowerCase() === taskText.toLowerCase())) {
+                    alert('This task already exists.');
+                    return;
+                }
                 tasks.push({ name: taskText, deferred: false, delegated: null, id: Date.now() });
                 storage.saveTasks(tasks);
                 renderTasks();
                 document.getElementById('task-input').value = '';
-            } else if (tasks.length >= 3) {
-                alert('Maximum 3 tasks allowed.');
             } else {
                 alert('Please enter a valid task.');
             }
@@ -289,25 +292,30 @@
         document.getElementById('task-list').addEventListener('click', (e) => {
             const index = e.target.dataset.index || e.target.parentElement.dataset.index;
             if (!index) return;
+            const taskIndex = parseInt(index);
             if (e.target.classList.contains('delete-task') || e.target.parentElement.classList.contains('delete-task')) {
-                tasks.splice(index, 1);
-                storage.saveTasks(tasks);
-                renderTasks();
+                if (confirm(`Are you sure you want to delete the task "${tasks[taskIndex].name}"?`)) {
+                    tasks.splice(taskIndex, 1);
+                    storage.saveTasks(tasks);
+                    renderTasks();
+                }
             } else if (e.target.classList.contains('defer-task') || e.target.parentElement.classList.contains('defer-task')) {
-                tasks[index].deferred = !tasks[index].deferred;
-                if (tasks[index].deferred) tasks[index].delegated = null;
+                tasks[taskIndex].deferred = !tasks[taskIndex].deferred;
+                if (tasks[taskIndex].deferred) tasks[taskIndex].delegated = null;
                 storage.saveTasks(tasks);
                 renderTasks();
             } else if (e.target.classList.contains('delegate-task') || e.target.parentElement.classList.contains('delegate-task')) {
                 const person = prompt('Enter the name of the person to delegate this task to:');
-                if (person) {
-                    tasks[index].delegated = person;
-                    tasks[index].deferred = false;
+                if (person && person.trim()) {
+                    tasks[taskIndex].delegated = person.trim();
+                    tasks[taskIndex].deferred = false;
                     storage.saveTasks(tasks);
                     renderTasks();
+                } else if (person !== null) {
+                    alert('Please enter a valid name for delegation.');
                 }
             } else if (e.target.classList.contains('add-to-calendar') || e.target.parentElement.classList.contains('add-to-calendar')) {
-                addToGoogleCalendar(tasks[index].name);
+                addToGoogleCalendar(tasks[taskIndex].name);
             }
         });
 
@@ -318,16 +326,17 @@
             const timeBlocks = document.getElementById('time-blocks');
             timeBlocks.innerHTML = '';
             const startHour = 8;
-            const endHour = 23.5; // Up to 23:30
+            const endHour = 23.5;
             for (let hour = startHour; hour <= endHour; hour += 0.5) {
                 const hourInt = Math.floor(hour);
                 const minutes = hour % 1 === 0 ? '00' : '30';
                 const timeStr = `${hourInt.toString().padStart(2, '0')}:${minutes}`;
                 const row = document.createElement('tr');
+                row.setAttribute('role', 'row');
                 row.innerHTML = `
-                    <td class="py-3 px-4 border-b border-gray-200 font-medium text-gray-700">${timeStr}</td>
-                    <td class="py-3 px-4 border-b border-gray-200">
-                        <div class="time-block-cell" contenteditable="true" data-time="${timeStr}"></div>
+                    <td class="py-3 px-4 border-b border-gray-200 font-medium text-gray-700" role="cell">${timeStr}</td>
+                    <td class="py-3 px-4 border-b border-gray-200" role="cell">
+                        <div class="time-block-cell" contenteditable="true" data-time="${timeStr}" aria-label="Task for ${timeStr}"></div>
                     </td>
                 `;
                 timeBlocks.appendChild(row);
@@ -340,7 +349,7 @@
         }
         renderTimeBlocks();
 
-      
+        // Google Calendar Integration
         const CLIENT_ID = '104302365772-3eb224gnmehqkemp23n4i0stdj4p74bh.apps.googleusercontent.com';
         const API_KEY = 'AIzaSyAEhrpuPllE0tbSihMqdqojlwWgXx51wIo';
         const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
@@ -357,11 +366,9 @@
                 discoveryDocs: DISCOVERY_DOCS,
                 scope: SCOPES
             }).then(() => {
-                gapi.auth2.getAuthInstance().isSignedIn.listen(updateSignInStatus);
-                updateSignInStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
-                document.getElementById('auth-calendar').addEventListener('click', () => {
-                    gapi.auth2.getAuthInstance().signIn();
-                });
+                const authInstance = gapi.auth2.getAuthInstance();
+                authInstance.isSignedIn.listen(updateSignInStatus);
+                updateSignInStatus(authInstance.isSignedIn.get());
             }).catch(error => {
                 document.getElementById('calendar-status').textContent = 'Failed to initialize Google Calendar API. Please check your API credentials.';
                 console.error('Google API init error:', error);
@@ -371,17 +378,27 @@
         function updateSignInStatus(isSignedIn) {
             const authButton = document.getElementById('auth-calendar');
             const status = document.getElementById('calendar-status');
+            // Remove existing listeners to prevent duplicates
+            authButton.removeEventListener('click', handleSignIn);
+            authButton.removeEventListener('click', handleSignOut);
+            
             if (isSignedIn) {
                 authButton.textContent = 'Sign Out';
                 status.textContent = 'Authorized. You can now add tasks to Google Calendar.';
-                authButton.removeEventListener('click', gapi.auth2.getAuthInstance().signIn);
-                authButton.addEventListener('click', () => gapi.auth2.getAuthInstance().signOut());
+                authButton.addEventListener('click', handleSignOut);
             } else {
                 authButton.textContent = 'Authorize Google Calendar';
                 status.textContent = 'Click to authorize and add tasks to calendar.';
-                authButton.removeEventListener('click', gapi.auth2.getAuthInstance().signOut);
-                authButton.addEventListener('click', () => gapi.auth2.getAuthInstance().signIn());
+                authButton.addEventListener('click', handleSignIn);
             }
+        }
+
+        function handleSignIn() {
+            gapi.auth2.getAuthInstance().signIn();
+        }
+
+        function handleSignOut() {
+            gapi.auth2.getAuthInstance().signOut();
         }
 
         function addToGoogleCalendar(taskText) {
