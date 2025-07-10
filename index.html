@@ -182,66 +182,119 @@
         document.getElementById('nav-toggle').addEventListener('click', () => {
             document.getElementById('mobile-menu').classList.toggle('hidden');
         });
-
-        // Task Manager Functionality
-        function addTask() {
-            const taskInput = document.getElementById('task-input');
-            const taskList = document.getElementById('task-list');
-            const task = taskInput.value.trim();
-            if (task) {
-                const li = document.createElement('li');
-                li.className = 'p-3 bg-gray-50 rounded-lg flex items-center space-x-3 task-item smooth-transition';
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.className = 'h-5 w-5 text-blue-500 rounded';
-                const taskText = document.createElement('span');
-                taskText.textContent = task;
-                taskText.className = 'flex-grow';
-                const deleteBtn = document.createElement('button');
-                deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
-                deleteBtn.className = 'text-red-500 hover:text-red-700';
-                deleteBtn.onclick = () => {
-                    li.remove();
-                    updateTaskOutput();
-                };
-                checkbox.addEventListener('change', () => {
-                    taskText.classList.toggle('task-completed', checkbox.checked);
-                    updateTaskOutput();
-                });
-                li.appendChild(checkbox);
-                li.appendChild(taskText);
-                li.appendChild(deleteBtn);
-                taskList.appendChild(li);
-                taskInput.value = '';
-                updateTaskOutput();
-            }
+// Task Manager Functionality
+function loadTasks() {
+    const taskList = document.getElementById('task-list');
+    const savedTasks = JSON.parse(localStorage.getItem('todayTodo')) || [];
+    taskList.innerHTML = ''; // Clear existing tasks
+    savedTasks.forEach(task => {
+        const li = document.createElement('li');
+        li.className = 'p-3 bg-gray-50 rounded-lg flex items-center space-x-3 task-item smooth-transition';
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.className = 'h-5 w-5 text-blue-500 rounded';
+        checkbox.checked = task.isCompleted;
+        const taskText = document.createElement('span');
+        taskText.textContent = task.text;
+        taskText.className = 'flex-grow';
+        if (task.isCompleted) {
+            taskText.classList.add('task-completed');
         }
-
-        // Update Task Manager Output
-        function updateTaskOutput() {
-            const taskList = document.getElementById('task-list');
-            const taskOutput = document.getElementById('task-list-output');
-            const tasks = Array.from(taskList.getElementsByTagName('li')).map(li => {
-                const text = li.querySelector('span').textContent;
-                const isCompleted = li.querySelector('input[type="checkbox"]').checked;
-                return { text, isCompleted };
-            });
-            if (tasks.length === 0) {
-                taskOutput.innerHTML = 'No tasks added yet.';
-            } else {
-                taskOutput.innerHTML = tasks.map(task => `
-                    <div class="${task.isCompleted ? 'task-completed' : ''}">
-                        ${task.isCompleted ? '<i class="fas fa-check-circle text-green-500 mr-2"></i>' : '<i class="fas fa-circle mr-2"></i>'}
-                        ${task.text}
-                    </div>
-                `).join('');
-            }
-        }
-
-        // Allow Enter key to add tasks
-        document.getElementById('task-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') addTask();
+        const deleteBtn = document.createElement('button');
+        deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+        deleteBtn.className = 'text-red-500 hover:text-red-700';
+        deleteBtn.onclick = () => {
+            li.remove();
+            saveTasks();
+            updateTaskOutput();
+        };
+        checkbox.addEventListener('change', () => {
+            taskText.classList.toggle('task-completed', checkbox.checked);
+            saveTasks();
+            updateTaskOutput();
         });
+        li.appendChild(checkbox);
+        li.appendChild(taskText);
+        li.appendChild(deleteBtn);
+        taskList.appendChild(li);
+    });
+    updateTaskOutput();
+}
+
+function saveTasks() {
+    const taskList = document.getElementById('task-list');
+    const tasks = Array.from(taskList.getElementsByTagName('li')).map(li => {
+        const text = li.querySelector('span').textContent;
+        const isCompleted = li.querySelector('input[type="checkbox"]').checked;
+        return { text, isCompleted };
+    });
+    localStorage.setItem('todayTodo', JSON.stringify(tasks));
+}
+
+function addTask() {
+    const taskInput = document.getElementById('task-input');
+    const taskList = document.getElementById('task-list');
+    const task = taskInput.value.trim();
+    if (task) {
+        const li = document.createElement('li');
+        li.className = 'p-3 bg-gray-50 rounded-lg flex items-center space-x-3 task-item smooth-transition';
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.className = 'h-5 w-5 text-blue-500 rounded';
+        const taskText = document.createElement('span');
+        taskText.textContent = task;
+        taskText.className = 'flex-grow';
+        const deleteBtn = document.createElement('button');
+        deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+        deleteBtn.className = 'text-red-500 hover:text-red-700';
+        deleteBtn.onclick = () => {
+            li.remove();
+            saveTasks();
+            updateTaskOutput();
+        };
+        checkbox.addEventListener('change', () => {
+            taskText.classList.toggle('task-completed', checkbox.checked);
+            saveTasks();
+            updateTaskOutput();
+        });
+        li.appendChild(checkbox);
+        li.appendChild(taskText);
+        li.appendChild(deleteBtn);
+        taskList.appendChild(li);
+        taskInput.value = '';
+        saveTasks();
+        updateTaskOutput();
+    }
+}
+
+// Update Task Manager Output
+function updateTaskOutput() {
+    const taskList = document.getElementById('task-list');
+    const taskOutput = document.getElementById('task-list-output');
+    const tasks = Array.from(taskList.getElementsByTagName('li')).map(li => {
+        const text = li.querySelector('span').textContent;
+        const isCompleted = li.querySelector('input[type="checkbox"]').checked;
+        return { text, isCompleted };
+    });
+    if (tasks.length === 0) {
+        taskOutput.innerHTML = 'No tasks added yet.';
+    } else {
+        taskOutput.innerHTML = tasks.map(task => `
+            <div class="${task.isCompleted ? 'task-completed' : ''}">
+                ${task.isCompleted ? '<i class="fas fa-check-circle text-green-500 mr-2"></i>' : '<i class="fas fa-circle mr-2"></i>'}
+                ${task.text}
+            </div>
+        `).join('');
+    }
+}
+
+// Allow Enter key to add tasks
+document.getElementById('task-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') addTask();
+});
+
+// Load tasks when the page loads
+window.addEventListener('load', loadTasks);
 
         // Brain Dump Functionality
         const brainDumpTextarea = document.getElementById('brain-dump');
