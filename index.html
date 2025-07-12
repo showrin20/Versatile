@@ -44,6 +44,16 @@
             margin-top: 16px;
             min-height: 100px;
         }
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -52,7 +62,7 @@
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center py-4">
                 <a href="#" class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">Versatile</a>
-                <button id="nav-toggle" class="lg:hidden text-gray-600 focus:outline-none" type="button">
+                <button id="nav-toggle" class="lg:hidden text-gray-600 focus:outline-none" type="button" aria-label="Toggle navigation">
                     <i class="fas fa-bars text-2xl"></i>
                 </button>
                 <div class="hidden lg:flex space-x-8 items-center" id="navbar-content">
@@ -93,13 +103,13 @@
                 4. Break into Subtasks<br>
                 5. Time Block Tasks<br>
                 6. Run Pomodoro Cycles
-              </p>
-              
+            </p>
         </section>
 
         <!-- Brain Dump -->
         <section class="bg-white p-6 rounded-xl shadow-lg mb-8">
             <h2 class="text-2xl font-semibold text-gray-800 mb-4">Brain Dump</h2>
+            <label for="brain-dump" class="sr-only">Jot down your thoughts</label>
             <textarea id="brain-dump" class="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-blue-500" rows="5" placeholder="Jot down your thoughts..."></textarea>
             <div class="flex space-x-4 mt-3">
                 <button id="save-brain-dump" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-blue-600 hover:to-purple-700 smooth-transition">Save Notes</button>
@@ -117,19 +127,20 @@
                 <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Task Manager</h2>
                 <div class="flex flex-col items-center">
                     <div class="flex w-full max-w-md space-x-2">
+                        <label for="task-input" class="sr-only">Add a new task</label>
                         <input type="text" id="task-input" placeholder="Add a new task" class="flex-grow p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-blue-500">
                         <button class="bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white font-semibold py-3 px-6 rounded-lg smooth-transition" onclick="addTask()">Add</button>
                     </div>
                     <ul id="task-list" class="w-full max-w-md mt-6 space-y-2"></ul>
                     <div class="output-box w-full max-w-md">
-                        <h3 class="text-lg font-medium text-gray-700 mb-2">Current Tasks</h3>
-                        <div id="task-list-output" class="text-gray-600">No tasks added yet.</div>
+                        <h3 class="text-lg font-medium text-gray-700 mb-2">Completed Tasks</h3>
+                        <div id="task-list-output" class="text-gray-600">No tasks completed yet.</div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Pomodoro Timer -->
+        <!-- Pomod oro Timer -->
         <section class="bg-white p-6 rounded-xl shadow-lg mb-8">
             <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Pomodoro Timer</h2>
             <div class="text-5xl font-mono text-center text-gray-800 mb-4" id="timer">25:00</div>
@@ -148,19 +159,32 @@
                 <div id="current-time" class="text-5xl font-bold text-white"></div>
             </div>
         </section>
-        <div class="flex flex-col justify-center items-center">
+
+        <!-- Calendar -->
+        <section class="bg-white p-6 rounded-xl shadow-lg mb-8">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Google Calendar</h2>
+            <div class="flex flex-col justify-center items-center mb-6">
+                <label for="calendarEmail" class="sr-only">Enter your Google Calendar email</label>
+                <input type="email" id="calendarEmail" placeholder="Enter your Google Calendar email" class="w-full max-w-md p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-blue-500 mb-4">
+                <button onclick="loadCalendar()" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-blue-600 hover:to-purple-700 smooth-transition">Load Calendar</button>
+            </div>
+            <div id="calendar-container" class="flex justify-center"></div>
+        </section>
+
+        <!-- Study Music -->
+        <section class="flex flex-col justify-center items-center mb-8">
             <h1 class="text-3xl font-bold text-gray-800 mb-4">Relaxing Study Music</h1>
             <iframe 
-              width="560" 
-              height="315" 
-              src="https://www.youtube.com/embed/QH0t_ogClhA?si=a-ZqnZXInvdneuwM&start=806" 
-              title="YouTube video player" 
-              frameborder="0" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-              referrerpolicy="strict-origin-when-cross-origin" 
-              allowfullscreen
+                class="w-full max-w-2xl h-64 md:h-80 lg:h-96"
+                src="https://www.youtube.com/embed/QH0t_ogClhA?si=a-ZqnZXInvdneuwM&start=806" 
+                title="YouTube video player" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                referrerpolicy="strict-origin-when-cross-origin" 
+                allowfullscreen
             ></iframe>
-          </div>
+        </section>
+
         <!-- Info-Desk -->
         <section id="info-desk" class="py-8 bg-white rounded-xl shadow-lg">
             <div class="container mx-auto px-4">
@@ -178,123 +202,150 @@
     </main>
 
     <script>
+        // Debounce utility
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
         // Navbar Toggle
         document.getElementById('nav-toggle').addEventListener('click', () => {
             document.getElementById('mobile-menu').classList.toggle('hidden');
         });
-// Task Manager Functionality
-function loadTasks() {
-    const taskList = document.getElementById('task-list');
-    const savedTasks = JSON.parse(localStorage.getItem('todayTodo')) || [];
-    taskList.innerHTML = ''; // Clear existing tasks
-    savedTasks.forEach(task => {
-        const li = document.createElement('li');
-        li.className = 'p-3 bg-gray-50 rounded-lg flex items-center space-x-3 task-item smooth-transition';
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.className = 'h-5 w-5 text-blue-500 rounded';
-        checkbox.checked = task.isCompleted;
-        const taskText = document.createElement('span');
-        taskText.textContent = task.text;
-        taskText.className = 'flex-grow';
-        if (task.isCompleted) {
-            taskText.classList.add('task-completed');
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 1024) {
+                document.getElementById('mobile-menu').classList.add('hidden');
+            }
+        });
+
+        // Task Manager Functionality
+        function loadTasks() {
+            const taskList = document.getElementById('task-list');
+            let savedTasks = [];
+            try {
+                savedTasks = JSON.parse(localStorage.getItem('todayTodo')) || [];
+            } catch (e) {
+                console.warn('Failed to load tasks from localStorage:', e);
+            }
+            taskList.innerHTML = '';
+            savedTasks.forEach(task => {
+                const li = document.createElement('li');
+                li.className = 'p-3 bg-gray-50 rounded-lg flex items-center space-x-3 task-item smooth-transition';
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'h-5 w-5 text-blue-500 rounded';
+                checkbox.checked = task.isCompleted;
+                checkbox.setAttribute('aria-label', `Mark task "${task.text}" as completed`);
+                const taskText = document.createElement('span');
+                taskText.textContent = task.text;
+                taskText.className = 'flex-grow';
+                if (task.isCompleted) {
+                    taskText.classList.add('task-completed');
+                }
+                const deleteBtn = document.createElement('button');
+                deleteBtn.innerHTML = '<i class="fas fa-trash-alt" aria-hidden="true"></i>';
+                deleteBtn.className = 'text-red-500 hover:text-red-700';
+                deleteBtn.setAttribute('aria-label', `Delete task "${task.text}"`);
+                deleteBtn.onclick = () => {
+                    li.remove();
+                    saveTasks();
+                    debouncedUpdateTaskOutput();
+                };
+                checkbox.addEventListener('change', () => {
+                    taskText.classList.toggle('task-completed', checkbox.checked);
+                    saveTasks();
+                    debouncedUpdateTaskOutput();
+                });
+                li.appendChild(checkbox);
+                li.appendChild(taskText);
+                li.appendChild(deleteBtn);
+                taskList.appendChild(li);
+            });
+            debouncedUpdateTaskOutput();
         }
-        const deleteBtn = document.createElement('button');
-        deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
-        deleteBtn.className = 'text-red-500 hover:text-red-700';
-        deleteBtn.onclick = () => {
-            li.remove();
-            saveTasks();
-            updateTaskOutput();
-        };
-        checkbox.addEventListener('change', () => {
-            taskText.classList.toggle('task-completed', checkbox.checked);
-            saveTasks();
-            updateTaskOutput();
+
+        function saveTasks() {
+            const taskList = document.getElementById('task-list');
+            const tasks = Array.from(taskList.getElementsByTagName('li')).map(li => {
+                const text = li.querySelector('span').textContent;
+                const isCompleted = li.querySelector('input[type="checkbox"]').checked;
+                return { text, isCompleted };
+            });
+            try {
+                localStorage.setItem('todayTodo', JSON.stringify(tasks));
+            } catch (e) {
+                console.warn('Failed to save tasks to localStorage:', e);
+                alert('Unable to save tasks due to browser restrictions.');
+            }
+        }
+
+        function addTask() {
+            const taskInput = document.getElementById('task-input');
+            const taskList = document.getElementById('task-list');
+            const task = taskInput.value.trim();
+            if (task) {
+                const li = document.createElement('li');
+                li.className = 'p-3 bg-gray-50 rounded-lg flex items-center space-x-3 task-item smooth-transition';
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'h-5 w-5 text-blue-500 rounded';
+                checkbox.setAttribute('aria-label', `Mark task "${task}" as completed`);
+                const taskText = document.createElement('span');
+                taskText.textContent = task;
+                taskText.className = 'flex-grow';
+                const deleteBtn = document.createElement('button');
+                deleteBtn.innerHTML = '<i class="fas fa-trash-alt" aria-hidden="true"></i>';
+                deleteBtn.className = 'text-red-500 hover:text-red-700';
+                deleteBtn.setAttribute('aria-label', `Delete task "${task}"`);
+                deleteBtn.onclick = () => {
+                    li.remove();
+                    saveTasks();
+                    debouncedUpdateTaskOutput();
+                };
+                checkbox.addEventListener('change', () => {
+                    taskText.classList.toggle('task-completed', checkbox.checked);
+                    saveTasks();
+                    debouncedUpdateTaskOutput();
+                });
+                li.appendChild(checkbox);
+                li.appendChild(taskText);
+                li.appendChild(deleteBtn);
+                taskList.appendChild(li);
+                taskInput.value = '';
+                saveTasks();
+                debouncedUpdateTaskOutput();
+            }
+        }
+
+        const debouncedUpdateTaskOutput = debounce(() => {
+            const taskList = document.getElementById('task-list');
+            const taskOutput = document.getElementById('task-list-output');
+            const tasks = Array.from(taskList.getElementsByTagName('li')).map(li => {
+                const text = li.querySelector('span').textContent;
+                const isCompleted = li.querySelector('input[type="checkbox"]').checked;
+                return { text, isCompleted };
+            });
+            const completedTasks = tasks.filter(task => task.isCompleted);
+            taskOutput.innerHTML = completedTasks.length > 0
+                ? `<div>Completed: ${completedTasks.map(task => `
+                    <div><i class="fas fa-check-circle text-green-500 mr-2"></i>${task.text}</div>
+                `).join('')}</div>`
+                : 'No tasks completed yet.';
+        }, 300);
+
+        document.getElementById('task-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addTask();
         });
-        li.appendChild(checkbox);
-        li.appendChild(taskText);
-        li.appendChild(deleteBtn);
-        taskList.appendChild(li);
-    });
-    updateTaskOutput();
-}
 
-function saveTasks() {
-    const taskList = document.getElementById('task-list');
-    const tasks = Array.from(taskList.getElementsByTagName('li')).map(li => {
-        const text = li.querySelector('span').textContent;
-        const isCompleted = li.querySelector('input[type="checkbox"]').checked;
-        return { text, isCompleted };
-    });
-    localStorage.setItem('todayTodo', JSON.stringify(tasks));
-}
-
-function addTask() {
-    const taskInput = document.getElementById('task-input');
-    const taskList = document.getElementById('task-list');
-    const task = taskInput.value.trim();
-    if (task) {
-        const li = document.createElement('li');
-        li.className = 'p-3 bg-gray-50 rounded-lg flex items-center space-x-3 task-item smooth-transition';
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.className = 'h-5 w-5 text-blue-500 rounded';
-        const taskText = document.createElement('span');
-        taskText.textContent = task;
-        taskText.className = 'flex-grow';
-        const deleteBtn = document.createElement('button');
-        deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
-        deleteBtn.className = 'text-red-500 hover:text-red-700';
-        deleteBtn.onclick = () => {
-            li.remove();
-            saveTasks();
-            updateTaskOutput();
-        };
-        checkbox.addEventListener('change', () => {
-            taskText.classList.toggle('task-completed', checkbox.checked);
-            saveTasks();
-            updateTaskOutput();
-        });
-        li.appendChild(checkbox);
-        li.appendChild(taskText);
-        li.appendChild(deleteBtn);
-        taskList.appendChild(li);
-        taskInput.value = '';
-        saveTasks();
-        updateTaskOutput();
-    }
-}
-
-// Update Task Manager Output
-function updateTaskOutput() {
-    const taskList = document.getElementById('task-list');
-    const taskOutput = document.getElementById('task-list-output');
-    const tasks = Array.from(taskList.getElementsByTagName('li')).map(li => {
-        const text = li.querySelector('span').textContent;
-        const isCompleted = li.querySelector('input[type="checkbox"]').checked;
-        return { text, isCompleted };
-    });
-    if (tasks.length === 0) {
-        taskOutput.innerHTML = 'No tasks added yet.';
-    } else {
-        taskOutput.innerHTML = tasks.map(task => `
-            <div class="${task.isCompleted ? 'task-completed' : ''}">
-                ${task.isCompleted ? '<i class="fas fa-check-circle text-green-500 mr-2"></i>' : '<i class="fas fa-circle mr-2"></i>'}
-                ${task.text}
-            </div>
-        `).join('');
-    }
-}
-
-// Allow Enter key to add tasks
-document.getElementById('task-input').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') addTask();
-});
-
-// Load tasks when the page loads
-window.addEventListener('load', loadTasks);
+        window.addEventListener('load', loadTasks);
 
         // Brain Dump Functionality
         const brainDumpTextarea = document.getElementById('brain-dump');
@@ -302,37 +353,61 @@ window.addEventListener('load', loadTasks);
         const clearBrainDumpBtn = document.getElementById('clear-brain-dump');
         const brainDumpOutput = document.getElementById('brain-dump-output');
 
-        // Load and display saved notes
         function updateBrainDumpOutput() {
-            const savedNotes = localStorage.getItem('brainDump');
-            brainDumpOutput.textContent = savedNotes || 'No notes saved yet.';
+            let savedNotes;
+            try {
+                savedNotes = localStorage.getItem('brainDump') || 'No notes saved yet.';
+            } catch (e) {
+                console.warn('Failed to load notes from localStorage:', e);
+                savedNotes = 'No notes saved yet.';
+            }
+            brainDumpOutput.textContent = savedNotes;
         }
 
         window.addEventListener('load', () => {
-            const savedNotes = localStorage.getItem('brainDump');
-            if (savedNotes) {
-                brainDumpTextarea.value = savedNotes;
+            let savedNotes;
+            try {
+                savedNotes = localStorage.getItem('brainDump');
+                if (savedNotes) {
+                    brainDumpTextarea.value = savedNotes;
+                }
+            } catch (e) {
+                console.warn('Failed to load notes from localStorage:', e);
             }
             updateBrainDumpOutput();
         });
 
-        // Save notes
+        brainDumpTextarea.addEventListener('input', () => {
+            if (brainDumpTextarea.value.length > 5000) {
+                brainDumpTextarea.value = brainDumpTextarea.value.slice(0, 5000);
+                alert('Maximum note length reached (5000 characters).');
+            }
+        });
+
         saveBrainDumpBtn.addEventListener('click', () => {
             const brainDump = brainDumpTextarea.value.trim();
             if (brainDump) {
-                localStorage.setItem('brainDump', brainDump);
-                updateBrainDumpOutput();
-                alert('Notes saved successfully!');
+                try {
+                    localStorage.setItem('brainDump', brainDump);
+                    updateBrainDumpOutput();
+                    alert('Notes saved successfully!');
+                } catch (e) {
+                    console.warn('Failed to save notes to localStorage:', e);
+                    alert('Unable to save notes due to browser restrictions.');
+                }
             } else {
                 alert('Please enter some notes before saving.');
             }
         });
 
-        // Clear notes
         clearBrainDumpBtn.addEventListener('click', () => {
             if (confirm('Are you sure you want to clear your notes?')) {
                 brainDumpTextarea.value = '';
-                localStorage.removeItem('brainDump');
+                try {
+                    localStorage.removeItem('brainDump');
+                } catch (e) {
+                    console.warn('Failed to clear notes from localStorage:', e);
+                }
                 updateBrainDumpOutput();
                 alert('Notes cleared.');
             }
@@ -371,7 +446,10 @@ window.addEventListener('load', loadTasks);
 
         function playSound() {
             const audio = new Audio('https://www.soundjay.com/buttons/beep-01a.mp3');
-            audio.play().catch(err => console.log('Audio playback failed:', err));
+            audio.play().catch(err => {
+                console.warn('Audio playback failed:', err);
+                alert('Timer sound could not play. Session has ended.');
+            });
         }
 
         startTimerBtn.addEventListener('click', () => {
@@ -413,7 +491,54 @@ window.addEventListener('load', loadTasks);
         }
         setInterval(updateClock, 1000);
         updateClock();
+
+        // Calendar Functionality
+        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Dhaka";
+
+        window.onload = function () {
+            loadTasks();
+            let savedNotes;
+            try {
+                savedNotes = localStorage.getItem('brainDump');
+                if (savedNotes) {
+                    brainDumpTextarea.value = savedNotes;
+                }
+            } catch (e) {
+                console.warn('Failed to load notes from localStorage:', e);
+            }
+            updateBrainDumpOutput();
+            const savedEmail = localStorage.getItem("lastCalendarEmail");
+            if (savedEmail) {
+                document.getElementById("calendarEmail").value = savedEmail;
+                loadCalendar(savedEmail);
+            }
+        };
+
+        function loadCalendar(emailParam = null) {
+            const email = emailParam || document.getElementById("calendarEmail").value.trim();
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                alert("Please enter a valid email address.");
+                return;
+            }
+            try {
+                localStorage.setItem("lastCalendarEmail", email);
+            } catch (e) {
+                console.warn('Failed to save calendar email to localStorage:', e);
+            }
+            const embedURL = `https://calendar.google.com/calendar/embed?src=${encodeURIComponent(email)}&ctz=${encodeURIComponent(timeZone)}`;
+            const calendarContainer = document.getElementById("calendar-container");
+            calendarContainer.innerHTML = '<p class="text-center text-gray-600">Loading calendar...</p>';
+            const iframe = document.createElement('iframe');
+            iframe.src = embedURL;
+            iframe.className = 'w-full max-w-4xl h-[600px] border-0';
+            iframe.setAttribute('frameborder', '0');
+            iframe.setAttribute('scrolling', 'no');
+            iframe.onerror = () => {
+                calendarContainer.innerHTML = '<p class="text-center text-red-500">Failed to load calendar. Please check the email or try again later.</p>';
+            };
+            calendarContainer.innerHTML = '';
+            calendarContainer.appendChild(iframe);
+        }
     </script>
 </body>
-</html> 
-
+</html>
