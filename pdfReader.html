@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧠📄 ADHD PDF Reader</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        // Configure PDF.js worker
+        if (typeof pdfjsLib !== 'undefined') {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chunk-text {
+            line-height: 1.8;
+            font-size: 18px;
+        }
+        .sentence-reveal {
+            opacity: 0.3;
+            transition: opacity 0.3s ease;
+        }
+        .sentence-current {
+            opacity: 1;
+            background: #fee2e2;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+        .progress-bar {
+            transition: width 0.3s ease;
+        }
+        .timer-circle {
+            animation: timer-spin 1s linear infinite;
+        }
+        @keyframes timer-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .floating-reminder {
+            animation: gentle-pulse 3s ease-in-out infinite;
+        }
+        @keyframes gentle-pulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+        .smooth-transition {
+            transition: all 0.3s ease;
+        }
+        
+        /* Enhanced visual improvements */
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .hover-lift {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Custom slider styles */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <a href="index.html" class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">Versatile</a>
+                <button id="nav-toggle-main" class="lg:hidden text-gray-600 focus:outline-none" type="button" aria-label="Toggle navigation">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+                <div class="hidden lg:flex space-x-8 items-center" id="navbar-content-main">
+                    <ul class="flex space-x-8">
+                        <li><a href="index.html" class="text-gray-600 hover:text-blue-500 font-medium smooth-transition">Home</a></li>
+                        <li><a href="index.html#about" class="text-gray-600 hover:text-blue-500 font-medium smooth-transition">About</a></li>
+                        <li><a href="hub.html" class="text-gray-600 hover:text-blue-500 font-medium smooth-transition">Tool Hub</a></li>
+                        <li><a href="pdfReader.html" class="text-gray-600 hover:text-blue-500 font-medium smooth-transition">PDF Reader</a></li>
+                        <li><a href="office.html" class="text-gray-600 hover:text-blue-500 font-medium smooth-transition">Office Hours Tracker</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="hidden lg:hidden" id="mobile-menu-main">
+                <ul class="flex flex-col space-y-4 py-4">
+                    <li><a href="index.html" class="text-gray-600 hover:text-blue-500 font-medium smooth-transition">Home</a></li>
+                    <li><a href="index.html#about" class="text-gray-600 hover:text-blue-500 font-medium smooth-transition">About</a></li>
+                    <li><a href="hub.html" class="text-gray-600 hover:text-blue-500 font-medium smooth-transition">Tool Hub</a></li>
+                    <li><a href="pdfReader.html" class="text-gray-600 hover:text-blue-500 font-medium smooth-transition">PDF Reader</a></li>
+                    <li><a href="office.html" class="text-gray-600 hover:text-blue-500 font-medium smooth-transition">Office Hours Tracker</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- PDF Reader Sub-Navigation -->
+    <div class="bg-gradient-to-r from-red-500 to-pink-500 shadow-md">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-3">
+                <div class="flex items-center space-x-4">
+                    <h2 class="text-lg font-bold text-white">🧠📄 ADHD PDF Reader</h2>
+                </div>
+                <div class="hidden lg:flex space-x-6 items-center">
+                    <a href="#reader" class="text-white hover:text-yellow-300 font-medium smooth-transition text-sm">Reader</a>
+                    <a href="#history" class="text-white hover:text-yellow-300 font-medium smooth-transition text-sm">History</a>
+                                        <button id="show-history-btn" class="bg-white bg-opacity-20 text-white px-3 py-1 rounded hover:bg-opacity-30 smooth-transition text-sm">
+                        My Books
+                    </button>
+                </div>
+                <button id="show-history-mobile-btn" class="lg:hidden bg-white bg-opacity-20 text-white px-3 py-1 rounded hover:bg-opacity-30 smooth-transition text-sm">
+                    My Books
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- Floating Reminder -->
+    <div id="reminder" class="floating-reminder fixed top-20 left-1/2 transform -translate-x-1/2 bg-red-100 text-red-800 px-4 py-2 rounded-full text-sm font-medium shadow-lg z-40">
+        Just one chunk. No pressure. 🌟
+    </div>
+    <!-- Reading History Modal -->
+    <div id="history-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            <div class="bg-gradient-to-r from-red-500 to-pink-500 text-white p-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold">📚 My Reading History</h2>
+                    <button id="close-history" class="text-white hover:text-gray-200 text-2xl">×</button>
+                </div>
+                <p class="mt-2 opacity-90">Track your reading progress and achievements</p>
+            </div>
+            <div class="p-6 overflow-y-auto max-h-[60vh]">
+                <div class="mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-gradient-to-r from-red-100 to-pink-100 p-4 rounded-lg text-center">
+                            <div class="text-2xl font-bold text-red-600" id="total-books">0</div>
+                            <div class="text-sm text-gray-600">Total Books</div>
+                        </div>
+                        <div class="bg-gradient-to-r from-green-100 to-emerald-100 p-4 rounded-lg text-center">
+                            <div class="text-2xl font-bold text-green-600" id="completed-books">0</div>
+                            <div class="text-sm text-gray-600">Completed</div>
+                        </div>
+                        <div class="bg-gradient-to-r from-blue-100 to-indigo-100 p-4 rounded-lg text-center">
+                            <div class="text-2xl font-bold text-blue-600" id="avg-success-rate">0%</div>
+                            <div class="text-sm text-gray-600">Avg Success Rate</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="books-list" class="space-y-4"></div>
+            </div>
+        </div>
+    </div>
+    <!-- Edit Book Modal -->
+    <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div class="bg-gradient-to-r from-red-500 to-pink-500 text-white p-4">
+                <h3 class="text-lg font-bold">Edit Book Name</h3>
+            </div>
+            <div class="p-6">
+                <input type="text" id="edit-book-name" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="Book name">
+                <div class="flex justify-end space-x-2 mt-4">
+                    <button id="cancel-edit" class="px-4 py-2 text-gray-600 hover:text-gray-800">Cancel</button>
+                    <button id="save-edit" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Main Container -->
+    <div class="max-w-4xl mx-auto p-6" id="reader">
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <h1 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-pink-600 mb-2">🧠📄 ADHD PDF Reader</h1>
+            <p class="text-gray-600">Zero-patience reading made easy</p>
+        </div>
+        <!-- Progress & Stats -->
+        <div class="bg-white rounded-lg shadow-md p-4 mb-6 hover-lift">
+            <div class="flex justify-between items-center mb-3">
+                <div class="text-sm text-gray-600">
+                    Progress: <span id="progress-text">0 of 0 chunks (0%)</span>
+                </div>
+                <div class="text-sm text-red-600 font-medium">
+                    📅 Streak: <span id="streak-count">0</span> days | Today: <span id="today-chunks">0</span> chunks
+                </div>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+                <div id="progress-bar" class="progress-bar bg-gradient-to-r from-red-400 to-pink-400 h-2 rounded-full" style="width: 0%"></div>
+            </div>
+        </div>
+        <!-- File Upload -->
+        <div id="upload-section" class="bg-white rounded-lg shadow-md p-8 text-center mb-6 hover-lift">
+            <div class="mb-4">
+                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Welcome to ADHD PDF Reader! 🧠📄</h3>
+            <p class="text-gray-500 mb-4">Choose a PDF file to start reading in ADHD-friendly chunks, or upload a saved data file to resume.<br>
+            <span class="text-sm font-medium text-blue-600">Your progress will be automatically saved and resumed!</span></p>
+            <input type="file" id="pdf-upload" accept=".pdf,.adhdpdf" class="hidden">
+            <button id="upload-button" class="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white px-6 py-3 rounded-lg font-medium transition-colors transform hover:scale-105 mb-4">
+                📤 Choose PDF or Data File
+            </button>
+            <div class="text-xs text-gray-400 max-w-md mx-auto">
+                <p class="mb-2">✨ <strong>Smart Features:</strong></p>
+                <ul class="text-left space-y-1">
+                    <li>• 🔄 Auto-resume from where you left off</li>
+                    <li>• 💾 Progress saved automatically</li>
+                    <li>• 📊 Reading streak tracking</li>
+                    <li>• 🎧 Text-to-speech support</li>
+                </ul>
+            </div>
+        </div>
+        <!-- Reading Interface -->
+        <div id="reading-interface" class="hidden">
+            <!-- Current Book Info -->
+            <div id="book-info" class="bg-white rounded-lg shadow-md p-4 mb-4">
+                <div class="flex justify-between items-center">
+                    <div class="flex-1">
+                        <div class="flex items-center space-x-2 mb-1">
+                            <h3 class="font-bold text-gray-800" id="current-book-name">Current Book</h3>
+                            <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">
+                                📖 Active
+                            </span>
+                        </div>
+                        <p class="text-sm text-gray-600">Started: <span id="book-start-date"></span></p>
+                        <p class="text-sm text-gray-500">Last read: <span id="book-last-read"></span></p>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-lg font-bold text-red-600" id="book-progress-percent">0%</div>
+                        <div class="text-sm text-gray-600">Complete</div>
+                        <div class="text-xs text-gray-500 mt-1" id="book-chunk-info">0 / 0 chunks</div>
+                        <button onclick="reader.switchBook()" class="mt-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded text-xs transition-colors mr-2">
+                            📚 Switch Book
+                        </button>
+                        <button onclick="reader.downloadCurrentBook()" class="mt-2 bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 rounded text-xs transition-colors" title="Download your reading data as a backup file">
+                            💾 Save Backup
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- Timer Section -->
+            <div id="timer-section" class="bg-white rounded-lg shadow-md p-4 mb-4 text-center">
+                <div class="flex items-center justify-center space-x-4">
+                    <div class="flex items-center space-x-2">
+                        <input id="timer-duration" type="number" min="1" max="10" value="2" class="w-16 px-2 py-1 rounded-lg border">
+                        <span class="text-gray-600">minutes</span>
+                    </div>
+                    <button id="timer-btn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                        Start Timer ⏱️
+                    </button>
+                    <div id="timer-display" class="text-2xl font-bold text-green-600 hidden flex items-center">
+                        <span class="timer-circle inline-block h-6 w-6 border-2 border-green-600 rounded-full mr-2"></span>
+                        <span><span id="timer-minutes">2</span>:<span id="timer-seconds">00</span></span>
+                    </div>
+                    <button id="timer-stop" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm hidden">
+                        Stop
+                    </button>
+                </div>
+            </div>
+            <!-- Reading Modes -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+                <div class="flex justify-center space-x-2 mb-6">
+                    <button id="chunk-mode" class="mode-btn bg-red-500 text-white px-6 py-3 rounded-lg font-medium shadow-lg transform hover:scale-105 transition-all duration-200">
+                        📄 Chunk Mode
+                    </button>
+                    <button id="sentence-mode" class="mode-btn bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium shadow-lg transform hover:scale-105 transition-all duration-200">
+                        🎮 Sentence Mode
+                    </button>
+                </div>
+                
+                <!-- Reading Quantity Controls -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-200">
+                        <h4 class="text-sm font-semibold text-blue-800 mb-3 flex items-center">
+                            <i class="fas fa-layer-group mr-2"></i>
+                            Chunks per Read
+                        </h4>
+                        <div class="flex items-center space-x-3">
+                            <input id="chunks-count" type="range" min="1" max="10" value="1" class="flex-1 accent-blue-500">
+                            <div class="bg-blue-500 text-white px-3 py-1 rounded-lg font-bold min-w-[3rem] text-center">
+                                <span id="chunks-display">1</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-blue-600 mt-2">Read multiple chunks in one go</p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg border border-purple-200">
+                        <h4 class="text-sm font-semibold text-purple-800 mb-3 flex items-center">
+                            <i class="fas fa-quote-right mr-2"></i>
+                            Sentences per Read
+                        </h4>
+                        <div class="flex items-center space-x-3">
+                            <input id="sentences-count" type="range" min="1" max="20" value="1" class="flex-1 accent-purple-500">
+                            <div class="bg-purple-500 text-white px-3 py-1 rounded-lg font-bold min-w-[3rem] text-center">
+                                <span id="sentences-display">1</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-purple-600 mt-2">Show multiple sentences at once</p>
+                    </div>
+                </div>
+                
+                <div class="flex justify-center space-x-4">
+                    <button id="font-increase" class="bg-gradient-to-r from-green-400 to-green-500 text-white px-4 py-2 rounded-lg shadow hover:from-green-500 hover:to-green-600 transition-all duration-200 transform hover:scale-105">
+                        <i class="fas fa-plus mr-1"></i> A+
+                    </button>
+                    <button id="font-decrease" class="bg-gradient-to-r from-orange-400 to-orange-500 text-white px-4 py-2 rounded-lg shadow hover:from-orange-500 hover:to-orange-600 transition-all duration-200 transform hover:scale-105">
+                        <i class="fas fa-minus mr-1"></i> A-
+                    </button>
+                    <button id="pause-reminders" class="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white px-4 py-2 rounded-lg shadow hover:from-yellow-500 hover:to-yellow-600 transition-all duration-200 transform hover:scale-105">
+                        <i class="fas fa-bell-slash mr-1"></i> Pause Reminders
+                    </button>
+                </div>
+            </div>
+            <!-- Text Display -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-4 hover-lift">
+                <div id="text-container" class="chunk-text text-gray-800 leading-relaxed min-h-[200px]">
+                    <div id="loading" class="text-center text-gray-500">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500 mx-auto mb-2"></div>
+                        Processing PDF...
+                    </div>
+                </div>
+            </div>
+            <!-- Controls -->
+            <div class="bg-white rounded-lg shadow-md p-4">
+                <div class="flex justify-between items-center">
+                    <button id="prev-btn" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                        ← Previous
+                    </button>
+                    <div class="flex space-x-2">
+                        <div class="flex space-x-2 items-center">
+                            <label class="text-sm">Speed:
+                                <input id="speech-rate" type="range" min="0.5" max="2" step="0.1" value="0.9" class="w-20">
+                            </label>
+                            <label class="text-sm">Voice:
+                                <select id="speech-voice" class="px-2 py-1 rounded border"></select>
+                            </label>
+                        </div>
+                        <button id="read-aloud-btn" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg font-medium">
+                            🎧 Read Aloud
+                        </button>
+                        <button id="pause-speech-btn" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium hidden">
+                            ⏸️ Pause
+                        </button>
+                    </div>
+                    <button id="next-btn" class="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white px-4 py-2 rounded-lg font-medium">
+                        Next →
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        class ADHDPDFReader {
+            constructor() {
+                console.log('Initializing ADHD PDF Reader...');
+                this.pdfDoc = null;
+                this.currentPage = 1;
+                this.totalPages = 0;
+                this.chunks = [];
+                this.currentChunk = 0;
+                this.currentSentence = 0;
+                this.mode = 'chunk';
+                this.timer = null;
+                this.timerSeconds = 0;
+                this.speechSynthesis = window.speechSynthesis;
+                this.currentUtterance = null;
+                this.reminderInterval = null;
+                this.currentPosition = { chunk: 0, sentence: 0, page: 1 };
+                this.streakData = { lastDate: null, streak: 0, todayChunks: 0 };
+                this.currentBookId = null;
+                this.editingBookId = null;
+                this.fontSize = 18;
+                this.remindersPaused = false;
+                this.chunksPerRead = 1;
+                this.sentencesPerRead = 1;
+                this.db = null;
+                this.initIndexedDB();
+                this.initializeEventListeners();
+                this.loadStreakData();
+                this.updateStreakDisplay();
+                this.startReminderCycle();
+                this.updateHistoryStats();
+                this.autoLoadLastBook();
+                console.log('ADHD PDF Reader initialized successfully');
+            }
+            
+            async initIndexedDB() {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open('ADHDPDFReader', 1);
+                    
+                    request.onerror = () => {
+                        console.warn('IndexedDB not available, falling back to localStorage');
+                        resolve(null);
+                    };
+                    
+                    request.onsuccess = (event) => {
+                        this.db = event.target.result;
+                        console.log('IndexedDB initialized successfully');
+                        resolve(this.db);
+                    };
+                    
+                    request.onupgradeneeded = (event) => {
+                        const db = event.target.result;
+                        if (!db.objectStoreNames.contains('pdfs')) {
+                            db.createObjectStore('pdfs', { keyPath: 'id' });
+                        }
+                    };
+                });
+            }
+            
+            async storePDFData(bookId, arrayBuffer) {
+                // Try IndexedDB first for large files
+                if (this.db) {
+                    try {
+                        const transaction = this.db.transaction(['pdfs'], 'readwrite');
+                        const store = transaction.objectStore('pdfs');
+                        await store.put({ id: bookId, data: arrayBuffer });
+                        console.log('PDF stored in IndexedDB');
+                        return 'indexeddb';
+                    } catch (error) {
+                        console.warn('IndexedDB storage failed, trying localStorage:', error);
+                    }
+                }
+                
+                // Fallback to localStorage for smaller files
+                if (arrayBuffer.byteLength <= 5 * 1024 * 1024) { // 5MB limit
+                    try {
+                        const uint8Array = new Uint8Array(arrayBuffer);
+                        let base64String = '';
+                        
+                        const chunkSize = 8192;
+                        for (let i = 0; i < uint8Array.length; i += chunkSize) {
+                            const chunk = uint8Array.slice(i, i + chunkSize);
+                            base64String += String.fromCharCode.apply(null, Array.from(chunk));
+                        }
+                        base64String = btoa(base64String);
+                        
+                        localStorage.setItem(`adhdReaderPDF_${bookId}`, base64String);
+                        console.log('PDF stored in localStorage');
+                        return 'localstorage';
+                    } catch (error) {
+                        console.warn('localStorage storage failed:', error);
+                    }
+                }
+                
+                // Final fallback: offer to save as file
+                console.warn('Browser storage failed, offering file download option');
+                this.offerFileDownload(bookId, arrayBuffer);
+                return 'file';
+            }
+            
+            async loadPDFData(bookId) {
+                // Try IndexedDB first
+                if (this.db) {
+                    try {
+                        const transaction = this.db.transaction(['pdfs'], 'readonly');
+                        const store = transaction.objectStore('pdfs');
+                        const request = store.get(bookId);
+                        
+                        return new Promise((resolve, reject) => {
+                            request.onsuccess = () => {
+                                if (request.result) {
+                                    console.log('PDF loaded from IndexedDB');
+                                    resolve(request.result.data);
+                                } else {
+                                    resolve(null);
+                                }
+                            };
+                            request.onerror = () => resolve(null);
+                        });
+                    } catch (error) {
+                        console.warn('IndexedDB load failed:', error);
+                    }
+                }
+                
+                // Fallback to localStorage
+                const base64Data = localStorage.getItem(`adhdReaderPDF_${bookId}`);
+                if (base64Data) {
+                    try {
+                        const binaryString = atob(base64Data);
+                        const arrayBuffer = new ArrayBuffer(binaryString.length);
+                        const uint8Array = new Uint8Array(arrayBuffer);
+                        
+                        for (let i = 0; i < binaryString.length; i++) {
+                            uint8Array[i] = binaryString.charCodeAt(i);
+                        }
+                        
+                        console.log('PDF loaded from localStorage');
+                        return arrayBuffer;
+                    } catch (error) {
+                        console.warn('localStorage load failed:', error);
+                    }
+                }
+                
+                return null;
+            }
+            
+            async deletePDFData(bookId) {
+                // Remove from IndexedDB
+                if (this.db) {
+                    try {
+                        const transaction = this.db.transaction(['pdfs'], 'readwrite');
+                        const store = transaction.objectStore('pdfs');
+                        await store.delete(bookId);
+                    } catch (error) {
+                        console.warn('IndexedDB deletion failed:', error);
+                    }
+                }
+                
+                // Remove from localStorage
+                localStorage.removeItem(`adhdReaderPDF_${bookId}`);
+            }
+            
+            offerFileDownload(bookId, arrayBuffer) {
+                const books = this.getBooks();
+                const book = books[bookId];
+                const fileName = book ? `${book.name}_data.adhdpdf` : `book_${bookId}_data.adhdpdf`;
+                
+                // Create a data package with PDF and metadata
+                const dataPackage = {
+                    version: '1.0',
+                    bookId: bookId,
+                    book: book,
+                    pdfData: Array.from(new Uint8Array(arrayBuffer)),
+                    position: this.loadBookPosition(bookId),
+                    timestamp: new Date().toISOString()
+                };
+                
+                const jsonString = JSON.stringify(dataPackage);
+                const blob = new Blob([jsonString], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                // Create download link
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                // Update book with file storage info
+                if (book) {
+                    book.storageType = 'file';
+                    book.fileName = fileName;
+                    this.saveBooks(books);
+                }
+                
+                // Show user notification
+                this.showFileStorageNotification(fileName);
+            }
+            
+            showFileStorageNotification(fileName) {
+                const notification = document.createElement('div');
+                notification.className = 'fixed top-20 right-4 bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded-lg shadow-lg z-50 max-w-sm';
+                notification.innerHTML = `
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 mr-3">
+                            <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-medium mb-1">PDF Saved as File</h4>
+                            <p class="text-sm mb-2">Your PDF data has been downloaded as <strong>${fileName}</strong></p>
+                            <p class="text-xs">Keep this file safe - you can upload it later to resume reading!</p>
+                        </div>
+                        <button onclick="this.parentElement.parentElement.remove()" class="flex-shrink-0 ml-2 text-blue-400 hover:text-blue-600">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+                    </div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Auto-remove after 10 seconds
+                setTimeout(() => {
+                    if (notification.parentElement) {
+                        notification.remove();
+                    }
+                }, 10000);
+            }
+            
+            async handleDataFileUpload(file) {
+                try {
+                    // Show loading message
+                    document.getElementById('upload-section').innerHTML = `
+                        <div class="text-center">
+                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500 mx-auto mb-4"></div>
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">Loading your saved book...</h3>
+                            <p class="text-gray-500">Restoring "${file.name}"</p>
+                        </div>
+                    `;
+                    
+                    const text = await file.text();
+                    const dataPackage = JSON.parse(text);
+                    
+                    // Validate data package
+                    if (!dataPackage.version || !dataPackage.bookId || !dataPackage.pdfData) {
+                        throw new Error('Invalid data file format');
+                    }
+                    
+                    console.log('Data package validated, restoring PDF...');
+                    
+                    // Convert array back to ArrayBuffer properly
+                    const uint8Array = new Uint8Array(dataPackage.pdfData);
+                    const arrayBuffer = uint8Array.buffer.slice(uint8Array.byteOffset, uint8Array.byteOffset + uint8Array.byteLength);
+                    
+                    console.log('ArrayBuffer created, size:', arrayBuffer.byteLength);
+                    
+                    // Load the PDF
+                    this.pdfDoc = await pdfjsLib.getDocument(arrayBuffer).promise;
+                    this.totalPages = this.pdfDoc.numPages;
+                    this.currentBookId = dataPackage.bookId;
+                    
+                    console.log('PDF loaded successfully, pages:', this.totalPages);
+                    
+                    // Restore book data
+                    const books = this.getBooks();
+                    books[this.currentBookId] = dataPackage.book;
+                    this.saveBooks(books);
+                    
+                    // Restore position
+                    if (dataPackage.position) {
+                        localStorage.setItem(`adhdReaderPosition_${this.currentBookId}`, JSON.stringify(dataPackage.position));
+                        this.currentPosition = dataPackage.position;
+                        this.currentChunk = this.currentPosition.chunk;
+                        this.currentSentence = this.currentPosition.sentence;
+                    }
+                    
+                    // Try to store in browser storage for future use
+                    await this.storePDFData(this.currentBookId, arrayBuffer);
+                    
+                    // Initialize reading interface
+                    this.updateCurrentBookInfo();
+                    await this.extractAllText();
+                    this.showReadingInterface();
+                    this.displayCurrentItem();
+                    
+                    console.log('Data file loaded successfully');
+                    
+                    // Show success notification
+                    const notification = document.createElement('div');
+                    notification.className = 'fixed top-20 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg shadow-lg z-50';
+                    notification.innerHTML = `
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="font-medium">Book restored successfully!</span>
+                        </div>
+                    `;
+                    document.body.appendChild(notification);
+                    setTimeout(() => notification.remove(), 3000);
+                    
+                } catch (error) {
+                    console.error('Error loading data file:', error);
+                    
+                    // Reset upload section on error
+                    this.resetUploadSection();
+                    
+                    let errorMessage = 'Error loading data file. ';
+                    if (error.message.includes('Invalid data file format')) {
+                        errorMessage += 'The file format is not valid. Please make sure it\'s a valid ADHD PDF Reader file (.adhdpdf).';
+                    } else if (error.message.includes('Invalid PDF')) {
+                        errorMessage += 'The PDF data in the file appears to be corrupted.';
+                    } else if (error.message.includes('ArrayBuffer')) {
+                        errorMessage += 'There was an issue processing the PDF data. Please try re-downloading the data file.';
+                    } else {
+                        errorMessage += 'Please make sure it\'s a valid ADHD PDF Reader file. Error: ' + error.message;
+                    }
+                    
+                    alert(errorMessage);
+                }
+            }
+            
+            checkPDFjsAvailability() {
+                if (typeof pdfjsLib === 'undefined') {
+                    console.error('PDF.js library is not loaded');
+                    alert('PDF.js library failed to load. Please refresh the page.');
+                    return false;
+                }
+                console.log('PDF.js version:', pdfjsLib.version);
+                return true;
+            }
+            initializeEventListeners() {
+                // Navigation toggles
+                const navToggleMain = document.getElementById('nav-toggle-main');
+                if (navToggleMain) {
+                    navToggleMain.addEventListener('click', () => {
+                        document.getElementById('mobile-menu-main').classList.toggle('hidden');
+                    });
+                }
+                
+                const navToggle = document.getElementById('nav-toggle');
+                if (navToggle) {
+                    navToggle.addEventListener('click', () => {
+                        document.getElementById('mobile-menu').classList.toggle('hidden');
+                    });
+                }
+                
+                // Reading quantity controls
+                const chunksCount = document.getElementById('chunks-count');
+                if (chunksCount) {
+                    chunksCount.addEventListener('input', (e) => {
+                        this.chunksPerRead = parseInt(e.target.value);
+                        document.getElementById('chunks-display').textContent = this.chunksPerRead;
+                    });
+                }
+                
+                const sentencesCount = document.getElementById('sentences-count');
+                if (sentencesCount) {
+                    sentencesCount.addEventListener('input', (e) => {
+                        this.sentencesPerRead = parseInt(e.target.value);
+                        document.getElementById('sentences-display').textContent = this.sentencesPerRead;
+                        if (this.mode === 'sentence') {
+                            this.displayCurrentItem();
+                        }
+                    });
+                }
+                
+                document.getElementById('show-history-btn').addEventListener('click', () => this.showHistory());
+                document.getElementById('show-history-mobile-btn').addEventListener('click', () => this.showHistory());
+                document.getElementById('close-history').addEventListener('click', () => this.hideHistory());
+                document.getElementById('cancel-edit').addEventListener('click', () => this.hideEditModal());
+                document.getElementById('save-edit').addEventListener('click', () => this.saveBookEdit());
+                
+                // File upload event listeners
+                const uploadInput = document.getElementById('pdf-upload');
+                const uploadButton = document.getElementById('upload-button');
+                if (uploadInput && uploadButton) {
+                    uploadInput.addEventListener('change', (e) => this.handleFileUpload(e));
+                    uploadButton.addEventListener('click', () => uploadInput.click());
+                }
+                
+                document.getElementById('next-btn').addEventListener('click', () => this.nextItem());
+                document.getElementById('prev-btn').addEventListener('click', () => this.prevItem());
+                document.getElementById('chunk-mode').addEventListener('click', () => this.setMode('chunk'));
+                document.getElementById('sentence-mode').addEventListener('click', () => this.setMode('sentence'));
+                document.getElementById('timer-btn').addEventListener('click', () => this.startTimer());
+                document.getElementById('timer-stop').addEventListener('click', () => this.stopTimer());
+                document.getElementById('read-aloud-btn').addEventListener('click', () => this.readAloud());
+                document.getElementById('pause-speech-btn').addEventListener('click', () => this.pauseSpeech());
+                document.getElementById('font-increase').addEventListener('click', () => this.adjustFontSize(2));
+                document.getElementById('font-decrease').addEventListener('click', () => this.adjustFontSize(-2));
+                document.getElementById('pause-reminders').addEventListener('click', () => this.toggleReminders());
+                if (!window.speechSynthesis) {
+                    document.getElementById('read-aloud-btn').disabled = true;
+                    document.getElementById('read-aloud-btn').title = 'Text-to-speech not supported in this browser';
+                }
+                this.populateVoices();
+                this.speechSynthesis.onvoiceschanged = () => this.populateVoices();
+                document.addEventListener('keydown', (e) => {
+                    if (e.code === 'Space' && this.mode === 'sentence') {
+                        e.preventDefault();
+                        this.nextItem();
+                    }
+                    if (e.code === 'ArrowRight') this.nextItem();
+                    if (e.code === 'ArrowLeft') this.prevItem();
+                });
+                document.getElementById('history-modal').addEventListener('click', (e) => {
+                    if (e.target.id === 'history-modal') this.hideHistory();
+                });
+                document.getElementById('edit-modal').addEventListener('click', (e) => {
+                    if (e.target.id === 'edit-modal') this.hideEditModal();
+                });
+            }
+            
+            async autoLoadLastBook() {
+                // Check if there's a currently active book that's not completed
+                const books = this.getBooks();
+                const lastActiveBook = this.getLastActiveBook(books);
+                
+                if (lastActiveBook) {
+                    // Check if we have the PDF data stored
+                    const pdfData = await this.loadPDFData(lastActiveBook.id);
+                    if (pdfData) {
+                        try {
+                            // Show loading message
+                            document.getElementById('upload-section').innerHTML = `
+                                <div class="text-center">
+                                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500 mx-auto mb-4"></div>
+                                    <h3 class="text-lg font-medium text-gray-900 mb-2">Loading your book...</h3>
+                                    <p class="text-gray-500">Resuming "${lastActiveBook.name}"</p>
+                                </div>
+                            `;
+                            
+                            // Load the PDF
+                            this.pdfDoc = await pdfjsLib.getDocument(pdfData).promise;
+                            this.totalPages = this.pdfDoc.numPages;
+                            this.currentBookId = lastActiveBook.id;
+                            this.updateCurrentBookInfo();
+                            await this.extractAllText();
+                            
+                            // Load saved position
+                            const savedPosition = this.loadBookPosition(this.currentBookId);
+                            if (savedPosition) {
+                                this.currentPosition = savedPosition;
+                                this.currentChunk = this.currentPosition.chunk;
+                                this.currentSentence = this.currentPosition.sentence;
+                            }
+                            
+                            this.showReadingInterface();
+                            this.displayCurrentItem();
+                            console.log(`Auto-loaded book: ${lastActiveBook.name}`);
+                        } catch (error) {
+                            console.error('Error auto-loading PDF:', error);
+                            // If there's an error, remove the corrupted data and show upload section
+                            await this.deletePDFData(lastActiveBook.id);
+                            console.log('Removed corrupted PDF data for book:', lastActiveBook.name);
+                            this.resetUploadSection();
+                        }
+                    }
+                }
+            }
+            
+            resetUploadSection() {
+                document.getElementById('upload-section').innerHTML = `
+                    <div class="mb-4">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Welcome to ADHD PDF Reader! 🧠📄</h3>
+                    <p class="text-gray-500 mb-4">Choose a PDF file to start reading in ADHD-friendly chunks, or upload a saved data file to resume.<br>
+                    <span class="text-sm font-medium text-blue-600">Your progress will be automatically saved and resumed!</span></p>
+                    <input type="file" id="pdf-upload" accept=".pdf,.adhdpdf" class="hidden">
+                    <button id="upload-button" class="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white px-6 py-3 rounded-lg font-medium transition-colors transform hover:scale-105 mb-4">
+                        📤 Choose PDF or Data File
+                    </button>
+                    <div class="text-xs text-gray-400 max-w-md mx-auto">
+                        <p class="mb-2">✨ <strong>Smart Features:</strong></p>
+                        <ul class="text-left space-y-1">
+                            <li>• 🔄 Auto-resume from where you left off</li>
+                            <li>• 💾 Progress saved automatically</li>
+                            <li>• 📊 Reading streak tracking</li>
+                            <li>• 🎧 Text-to-speech support</li>
+                        </ul>
+                    </div>
+                `;
+                // Re-attach event listeners properly
+                const uploadInput = document.getElementById('pdf-upload');
+                const uploadButton = document.getElementById('upload-button');
+                
+                if (uploadInput && uploadButton) {
+                    uploadInput.addEventListener('change', (e) => this.handleFileUpload(e));
+                    uploadButton.addEventListener('click', () => uploadInput.click());
+                }
+            }
+            
+            getLastActiveBook(books) {
+                const activeBooks = Object.values(books).filter(book => book.status !== 'completed');
+                if (activeBooks.length === 0) return null;
+                
+                // Sort by last read date and return the most recent
+                return activeBooks.sort((a, b) => new Date(b.lastReadDate) - new Date(a.lastReadDate))[0];
+            }
+            
+            async handleFileUpload(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                // Check if it's a data file
+                if (file.name.endsWith('.adhdpdf')) {
+                    await this.handleDataFileUpload(file);
+                    return;
+                }
+                
+                // Check if PDF.js is available
+                if (!this.checkPDFjsAvailability()) {
+                    return;
+                }
+                
+                console.log('File selected:', file.name, 'Size:', file.size, 'Type:', file.type);
+                
+                if (file.size > 50 * 1024 * 1024) {
+                    alert('File is too large. Please upload a PDF under 50MB.');
+                    return;
+                }
+                
+                if (!file.type.includes('pdf')) {
+                    alert('Please select a valid PDF file or ADHD PDF Reader data file (.adhdpdf).');
+                    return;
+                }
+                
+                try {
+                    console.log('Starting to read file...');
+                    const arrayBuffer = await file.arrayBuffer();
+                    console.log('File read successfully, size:', arrayBuffer.byteLength);
+                    
+                    console.log('Loading PDF with PDF.js...');
+                    this.pdfDoc = await pdfjsLib.getDocument(arrayBuffer).promise;
+                    console.log('PDF loaded successfully, pages:', this.pdfDoc.numPages);
+                    
+                    this.totalPages = this.pdfDoc.numPages;
+                    this.currentBookId = this.createBookRecord(file.name);
+                    console.log('Book record created with ID:', this.currentBookId);
+                    
+                    // Store the PDF data using new storage system
+                    const storageResult = await this.storePDFData(this.currentBookId, arrayBuffer);
+                    console.log('PDF data stored successfully using:', storageResult);
+                    
+                    this.updateCurrentBookInfo();
+                    await this.extractAllText();
+                    const savedPosition = this.loadBookPosition(this.currentBookId);
+                    if (savedPosition) {
+                        this.currentPosition = savedPosition;
+                        this.currentChunk = this.currentPosition.chunk;
+                        this.currentSentence = this.currentPosition.sentence;
+                    }
+                    this.showReadingInterface();
+                    this.displayCurrentItem();
+                    this.updateStreakData();
+                } catch (error) {
+                    console.error('Detailed error loading PDF:', error);
+                    console.error('Error name:', error.name);
+                    console.error('Error message:', error.message);
+                    console.error('Error stack:', error.stack);
+                    
+                    let errorMessage = 'Failed to load PDF. ';
+                    if (error.message.includes('Invalid PDF')) {
+                        errorMessage += 'The file appears to be corrupted or not a valid PDF.';
+                    } else if (error.message.includes('encrypted')) {
+                        errorMessage += 'Encrypted PDFs are not supported. Please use an unencrypted PDF.';
+                    } else if (error.message.includes('password')) {
+                        errorMessage += 'Password-protected PDFs are not supported.';
+                    } else {
+                        errorMessage += 'Please ensure it\'s a valid, non-encrypted PDF file. Error: ' + error.message;
+                    }
+                    
+                    alert(errorMessage);
+                }
+            }
+            async extractAllText() {
+                this.chunks = [];
+                document.getElementById('text-container').innerHTML = '<div class="text-center text-gray-500">Processing PDF...</div>';
+                for (let pageNum = 1; pageNum <= this.totalPages; pageNum++) {
+                    const page = await this.pdfDoc.getPage(pageNum);
+                    const textContent = await page.getTextContent();
+                    let pageText = textContent.items.map(item => item.str).join(' ');
+                    const words = pageText.split(/\s+/);
+                    let chunk = '';
+                    let wordCount = 0;
+                    for (const word of words) {
+                        chunk += word + ' ';
+                        wordCount++;
+                        if (wordCount >= 50) {
+                            this.chunks.push({ text: chunk.trim(), page: pageNum });
+                            chunk = '';
+                            wordCount = 0;
+                        }
+                    }
+                    if (chunk.trim()) {
+                        this.chunks.push({ text: chunk.trim(), page: pageNum });
+                    }
+                }
+                this.updateBookProgress();
+                this.updateProgressDisplay();
+            }
+            showReadingInterface() {
+                document.getElementById('upload-section').classList.add('hidden');
+                document.getElementById('reading-interface').classList.remove('hidden');
+            }
+            displayCurrentItem() {
+                const container = document.getElementById('text-container');
+                container.innerHTML = '';
+                
+                if (this.mode === 'chunk') {
+                    // Display multiple chunks
+                    let combinedText = '';
+                    for (let i = 0; i < this.chunksPerRead && (this.currentChunk + i) < this.chunks.length; i++) {
+                        const chunk = this.chunks[this.currentChunk + i];
+                        if (chunk) {
+                            if (i > 0) combinedText += '\n\n';
+                            combinedText += chunk.text;
+                        }
+                    }
+                    
+                    if (combinedText) {
+                        const div = document.createElement('div');
+                        div.className = 'leading-relaxed';
+                        div.textContent = combinedText;
+                        container.appendChild(div);
+                    }
+                } else {
+                    // Sentence mode with multiple sentences
+                    const chunk = this.chunks[this.currentChunk];
+                    if (chunk) {
+                        const sentences = chunk.text.match(/[^.!?]+[.!?]+/g) || [chunk.text];
+                        
+                        sentences.forEach((sentence, index) => {
+                            const span = document.createElement('span');
+                            span.textContent = sentence.trim();
+                            
+                            // Highlight current sentence(s)
+                            const isCurrentSentence = index >= this.currentSentence && 
+                                                    index < this.currentSentence + this.sentencesPerRead;
+                            
+                            span.className = isCurrentSentence ? 'sentence-current' : 'sentence-reveal';
+                            container.appendChild(span);
+                            container.appendChild(document.createTextNode(' '));
+                        });
+                    }
+                }
+                
+                document.getElementById('prev-btn').disabled = this.currentChunk === 0 && this.currentSentence === 0;
+                document.getElementById('next-btn').disabled = this.currentChunk >= this.chunks.length - 1 && 
+                    (this.mode === 'chunk' || this.currentSentence >= (this.chunks[this.currentChunk]?.text.match(/[^.!?]+[.!?]+/g) || [1]).length - 1);
+                
+                this.savePosition();
+                this.updateProgressDisplay();
+            }
+            updateProgressDisplay() {
+                document.getElementById('progress-text').textContent = `${this.currentChunk + 1} of ${this.chunks.length} chunks (${Math.round(((this.currentChunk + 1) / this.chunks.length) * 100)}%)`;
+                document.getElementById('progress-bar').style.width = `${((this.currentChunk + 1) / this.chunks.length) * 100}%`;
+            }
+            nextItem() {
+                if (this.mode === 'chunk') {
+                    if (this.currentChunk < this.chunks.length - this.chunksPerRead) {
+                        this.currentChunk += this.chunksPerRead;
+                        this.currentSentence = 0;
+                        this.displayCurrentItem();
+                        this.updateStreakData();
+                    } else if (this.currentChunk < this.chunks.length - 1) {
+                        // Move to the last available chunk if we can't move by full chunksPerRead
+                        this.currentChunk = this.chunks.length - 1;
+                        this.currentSentence = 0;
+                        this.displayCurrentItem();
+                        this.updateStreakData();
+                    }
+                } else {
+                    const sentences = this.chunks[this.currentChunk].text.match(/[^.!?]+[.!?]+/g) || [this.chunks[this.currentChunk].text];
+                    if (this.currentSentence + this.sentencesPerRead < sentences.length) {
+                        this.currentSentence += this.sentencesPerRead;
+                        this.displayCurrentItem();
+                    } else if (this.currentChunk < this.chunks.length - 1) {
+                        this.currentChunk++;
+                        this.currentSentence = 0;
+                        this.displayCurrentItem();
+                        this.updateStreakData();
+                    }
+                }
+            }
+            prevItem() {
+                if (this.mode === 'chunk') {
+                    if (this.currentChunk >= this.chunksPerRead) {
+                        this.currentChunk -= this.chunksPerRead;
+                        this.currentSentence = 0;
+                        this.displayCurrentItem();
+                    } else if (this.currentChunk > 0) {
+                        // Move to the beginning if we can't move back by full chunksPerRead
+                        this.currentChunk = 0;
+                        this.currentSentence = 0;
+                        this.displayCurrentItem();
+                    }
+                } else {
+                    if (this.currentSentence >= this.sentencesPerRead) {
+                        this.currentSentence -= this.sentencesPerRead;
+                        this.displayCurrentItem();
+                    } else if (this.currentChunk > 0) {
+                        this.currentChunk--;
+                        const sentences = this.chunks[this.currentChunk].text.match(/[^.!?]+[.!?]+/g) || [this.chunks[this.currentChunk].text];
+                        this.currentSentence = Math.max(0, sentences.length - this.sentencesPerRead);
+                        this.displayCurrentItem();
+                    }
+                }
+            }
+            setMode(mode) {
+                this.mode = mode;
+                this.currentSentence = 0;
+                document.getElementById('chunk-mode').classList.toggle('bg-red-500', mode === 'chunk');
+                document.getElementById('chunk-mode').classList.toggle('text-white', mode === 'chunk');
+                document.getElementById('chunk-mode').classList.toggle('bg-gray-300', mode !== 'chunk');
+                document.getElementById('chunk-mode').classList.toggle('text-gray-700', mode !== 'chunk');
+                document.getElementById('sentence-mode').classList.toggle('bg-red-500', mode === 'sentence');
+                document.getElementById('sentence-mode').classList.toggle('text-white', mode === 'sentence');
+                document.getElementById('sentence-mode').classList.toggle('bg-gray-300', mode !== 'sentence');
+                document.getElementById('sentence-mode').classList.toggle('text-gray-700', mode !== 'sentence');
+                this.displayCurrentItem();
+            }
+            startTimer() {
+                const duration = parseInt(document.getElementById('timer-duration').value) * 60;
+                if (isNaN(duration) || duration <= 0) {
+                    alert('Please enter a valid duration between 1 and 10 minutes.');
+                    return;
+                }
+                this.timerSeconds = duration;
+                document.getElementById('timer-btn').classList.add('hidden');
+                document.getElementById('timer-display').classList.remove('hidden');
+                document.getElementById('timer-stop').classList.remove('hidden');
+                this.updateTimerDisplay();
+                this.timer = setInterval(() => {
+                    this.timerSeconds--;
+                    this.updateTimerDisplay();
+                    if (this.timerSeconds <= 0) {
+                        this.stopTimer();
+                        alert('Timer finished! Great job! 🌟');
+                    }
+                }, 1000);
+            }
+            updateTimerDisplay() {
+                const minutes = Math.floor(this.timerSeconds / 60);
+                const seconds = this.timerSeconds % 60;
+                document.getElementById('timer-minutes').textContent = minutes;
+                document.getElementById('timer-seconds').textContent = seconds.toString().padStart(2, '0');
+            }
+            stopTimer() {
+                clearInterval(this.timer);
+                this.timer = null;
+                document.getElementById('timer-btn').classList.remove('hidden');
+                document.getElementById('timer-display').classList.add('hidden');
+                document.getElementById('timer-stop').classList.add('hidden');
+            }
+            readAloud() {
+                if (!this.speechSynthesis) return;
+                if (this.currentUtterance) {
+                    this.speechSynthesis.cancel();
+                    this.currentUtterance = null;
+                }
+                
+                let text = '';
+                if (this.mode === 'chunk') {
+                    // Read multiple chunks
+                    for (let i = 0; i < this.chunksPerRead && (this.currentChunk + i) < this.chunks.length; i++) {
+                        const chunk = this.chunks[this.currentChunk + i];
+                        if (chunk) {
+                            if (i > 0) text += ' ';
+                            text += chunk.text;
+                        }
+                    }
+                } else {
+                    // Read multiple sentences
+                    const chunk = this.chunks[this.currentChunk];
+                    if (chunk) {
+                        const sentences = chunk.text.match(/[^.!?]+[.!?]+/g) || [chunk.text];
+                        for (let i = 0; i < this.sentencesPerRead && (this.currentSentence + i) < sentences.length; i++) {
+                            if (i > 0) text += ' ';
+                            text += sentences[this.currentSentence + i];
+                        }
+                    }
+                }
+                
+                this.currentUtterance = new SpeechSynthesisUtterance(text);
+                const voiceSelect = document.getElementById('speech-voice');
+                const selectedVoice = this.speechSynthesis.getVoices().find(voice => voice.name === voiceSelect.value);
+                if (selectedVoice) {
+                    this.currentUtterance.voice = selectedVoice;
+                }
+                this.currentUtterance.rate = parseFloat(document.getElementById('speech-rate').value);
+                this.currentUtterance.onend = () => {
+                    document.getElementById('read-aloud-btn').classList.remove('hidden');
+                    document.getElementById('pause-speech-btn').classList.add('hidden');
+                    this.currentUtterance = null;
+                };
+                this.speechSynthesis.speak(this.currentUtterance);
+                document.getElementById('read-aloud-btn').classList.add('hidden');
+                document.getElementById('pause-speech-btn').classList.remove('hidden');
+            }
+            pauseSpeech() {
+                if (this.speechSynthesis.speaking) {
+                    this.speechSynthesis.pause();
+                    document.getElementById('pause-speech-btn').textContent = '▶️ Resume';
+                    document.getElementById('pause-speech-btn').removeEventListener('click', this.pauseSpeech);
+                    document.getElementById('pause-speech-btn').addEventListener('click', () => this.resumeSpeech());
+                }
+            }
+            resumeSpeech() {
+                if (this.speechSynthesis.paused) {
+                    this.speechSynthesis.resume();
+                    document.getElementById('pause-speech-btn').textContent = '⏸️ Pause';
+                    document.getElementById('pause-speech-btn').removeEventListener('click', this.resumeSpeech);
+                    document.getElementById('pause-speech-btn').addEventListener('click', () => this.pauseSpeech());
+                }
+            }
+            adjustFontSize(delta) {
+                this.fontSize = Math.max(12, Math.min(30, this.fontSize + delta));
+                document.getElementById('text-container').style.fontSize = `${this.fontSize}px`;
+            }
+            toggleReminders() {
+                this.remindersPaused = !this.remindersPaused;
+                document.getElementById('pause-reminders').textContent = this.remindersPaused ? 'Resume Reminders' : 'Pause Reminders';
+                document.getElementById('reminder').style.display = this.remindersPaused ? 'none' : 'block';
+            }
+            populateVoices() {
+                if (!this.speechSynthesis) return;
+                const voiceSelect = document.getElementById('speech-voice');
+                voiceSelect.innerHTML = '';
+                const voices = this.speechSynthesis.getVoices();
+                voices.forEach(voice => {
+                    const option = document.createElement('option');
+                    option.value = voice.name;
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    voiceSelect.appendChild(option);
+                });
+            }
+            createBookRecord(fileName) {
+                const books = this.getBooks();
+                const bookId = Date.now().toString();
+                const book = {
+                    id: bookId,
+                    name: fileName.replace('.pdf', ''),
+                    originalName: fileName,
+                    startDate: new Date().toISOString(),
+                    lastReadDate: new Date().toISOString(),
+                    totalChunks: 0,
+                    currentChunk: 0,
+                    successRate: 0,
+                    status: 'reading',
+                    timeSpent: 0
+                };
+                books[bookId] = book;
+                this.saveBooks(books);
+                return bookId;
+            }
+            updateBookProgress() {
+                if (!this.currentBookId) return;
+                const books = this.getBooks();
+                if (books[this.currentBookId]) {
+                    books[this.currentBookId].currentChunk = this.currentChunk;
+                    books[this.currentBookId].totalChunks = this.chunks.length;
+                    books[this.currentBookId].successRate = Math.round((this.currentChunk / this.chunks.length) * 100);
+                    books[this.currentBookId].lastReadDate = new Date().toISOString();
+                    if (this.currentChunk >= this.chunks.length - 1) {
+                        books[this.currentBookId].status = 'completed';
+                    }
+                    this.saveBooks(books);
+                    this.updateCurrentBookInfo();
+                }
+            }
+            updateCurrentBookInfo() {
+                if (!this.currentBookId) return;
+                const books = this.getBooks();
+                const book = books[this.currentBookId];
+                if (book) {
+                    document.getElementById('current-book-name').textContent = book.name;
+                    document.getElementById('book-start-date').textContent = new Date(book.startDate).toLocaleDateString();
+                    document.getElementById('book-last-read').textContent = new Date(book.lastReadDate).toLocaleDateString();
+                    document.getElementById('book-progress-percent').textContent = `${book.successRate}%`;
+                    document.getElementById('book-chunk-info').textContent = `${book.currentChunk} / ${book.totalChunks} chunks`;
+                }
+            }
+            getBooks() {
+                const books = localStorage.getItem('adhdReaderBooks');
+                return books ? JSON.parse(books) : {};
+            }
+            saveBooks(books) {
+                localStorage.setItem('adhdReaderBooks', JSON.stringify(books));
+            }
+            loadBookPosition(bookId) {
+                const position = localStorage.getItem(`adhdReaderPosition_${bookId}`);
+                return position ? JSON.parse(position) : null;
+            }
+            savePosition() {
+                this.currentPosition = {
+                    chunk: this.currentChunk,
+                    sentence: this.currentSentence,
+                    page: this.chunks[this.currentChunk]?.page || 1
+                };
+                if (this.currentBookId) {
+                    localStorage.setItem(`adhdReaderPosition_${this.currentBookId}`, JSON.stringify(this.currentPosition));
+                    this.updateBookProgress();
+                }
+            }
+            showHistory() {
+                this.renderBooksList();
+                this.updateHistoryStats();
+                document.getElementById('history-modal').classList.remove('hidden');
+            }
+            hideHistory() {
+                document.getElementById('history-modal').classList.add('hidden');
+            }
+            renderBooksList() {
+                const books = this.getBooks();
+                const booksList = document.getElementById('books-list');
+                booksList.innerHTML = '';
+                const booksArray = Object.values(books).sort((a, b) => new Date(b.lastReadDate) - new Date(a.lastReadDate));
+                if (booksArray.length === 0) {
+                    booksList.innerHTML = '<p class="text-gray-500 text-center py-8">No books read yet. Upload your first PDF to get started!</p>';
+                    return;
+                }
+                booksArray.forEach(book => {
+                    const bookCard = document.createElement('div');
+                    bookCard.className = 'bg-gray-50 rounded-lg p-4 border border-gray-200';
+                    const statusColor = book.status === 'completed' ? 'text-green-600' : 'text-blue-600';
+                    const statusIcon = book.status === 'completed' ? '✅' : '📖';
+                    bookCard.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-gray-800 mb-1">${statusIcon} ${book.name}</h4>
+                                <div class="text-sm text-gray-600 space-y-1">
+                                    <div>Progress: ${book.currentChunk}/${book.totalChunks} chunks (${book.successRate}%)</div>
+                                    <div>Started: ${new Date(book.startDate).toLocaleDateString()}</div>
+                                    <div>Last read: ${new Date(book.lastReadDate).toLocaleDateString()}</div>
+                                    <div class="flex items-center mt-2">
+                                        <div class="w-32 bg-gray-200 rounded-full h-2 mr-2">
+                                            <div class="bg-gradient-to-r from-red-400 to-pink-400 h-2 rounded-full" style="width: ${book.successRate}%"></div>
+                                        </div>
+                                        <span class="${statusColor} font-medium text-sm">${book.status}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex space-x-1 ml-4">
+                                <button onclick="reader.editBook('${book.id}')" class="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="reader.deleteBook('${book.id}')" class="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    booksList.appendChild(bookCard);
+                });
+            }
+            updateHistoryStats() {
+                const books = this.getBooks();
+                const booksArray = Object.values(books);
+                const totalBooks = booksArray.length;
+                const completedBooks = booksArray.filter(book => book.status === 'completed').length;
+                const avgSuccessRate = totalBooks > 0 ? Math.round(booksArray.reduce((sum, book) => sum + book.successRate, 0) / totalBooks) : 0;
+                document.getElementById('total-books').textContent = totalBooks;
+                document.getElementById('completed-books').textContent = completedBooks;
+                document.getElementById('avg-success-rate').textContent = `${avgSuccessRate}%`;
+            }
+            editBook(bookId) {
+                const books = this.getBooks();
+                const book = books[bookId];
+                if (book) {
+                    this.editingBookId = bookId;
+                    document.getElementById('edit-book-name').value = book.name;
+                    document.getElementById('edit-modal').classList.remove('hidden');
+                }
+            }
+            hideEditModal() {
+                document.getElementById('edit-modal').classList.add('hidden');
+                this.editingBookId = null;
+            }
+            saveBookEdit() {
+                if (!this.editingBookId) return;
+                const newName = document.getElementById('edit-book-name').value.trim();
+                if (!newName) {
+                    alert('Please enter a valid book name.');
+                    return;
+                }
+                const books = this.getBooks();
+                if (books[this.editingBookId]) {
+                    books[this.editingBookId].name = newName;
+                    this.saveBooks(books);
+                    this.renderBooksList();
+                    this.updateCurrentBookInfo();
+                }
+                this.hideEditModal();
+            }
+            async deleteBook(bookId) {
+                if (confirm('Are you sure you want to delete this book? This action cannot be undone.')) {
+                    const books = this.getBooks();
+                    delete books[bookId];
+                    if (this.currentBookId === bookId) {
+                        this.currentBookId = null;
+                        this.pdfDoc = null;
+                        this.chunks = [];
+                        this.currentChunk = 0;
+                        this.currentSentence = 0;
+                        this.currentPosition = { chunk: 0, sentence: 0, page: 1 };
+                        document.getElementById('reading-interface').classList.add('hidden');
+                        document.getElementById('upload-section').classList.remove('hidden');
+                        document.getElementById('text-container').innerHTML = '';
+                        document.getElementById('progress-text').textContent = '0 of 0 chunks (0%)';
+                        document.getElementById('progress-bar').style.width = '0%';
+                    }
+                    localStorage.removeItem(`adhdReaderPosition_${bookId}`);
+                    await this.deletePDFData(bookId);
+                    this.saveBooks(books);
+                    this.renderBooksList();
+                    this.updateHistoryStats();
+                }
+            }
+            
+            switchBook() {
+                // Save current position before switching
+                if (this.currentBookId) {
+                    this.savePosition();
+                }
+                
+                // Reset the interface to upload mode
+                this.currentBookId = null;
+                this.pdfDoc = null;
+                this.chunks = [];
+                this.currentChunk = 0;
+                this.currentSentence = 0;
+                this.currentPosition = { chunk: 0, sentence: 0, page: 1 };
+                
+                // Show upload section, hide reading interface
+                document.getElementById('reading-interface').classList.add('hidden');
+                document.getElementById('upload-section').classList.remove('hidden');
+                
+                // Reset displays
+                document.getElementById('text-container').innerHTML = '';
+                document.getElementById('progress-text').textContent = '0 of 0 chunks (0%)';
+                document.getElementById('progress-bar').style.width = '0%';
+                
+                // Clear file input for new selection
+                document.getElementById('pdf-upload').value = '';
+                
+                console.log('Switched to upload mode - ready for new book selection');
+            }
+            
+            async downloadCurrentBook() {
+                if (!this.currentBookId || !this.pdfDoc) {
+                    alert('No book is currently loaded to download.');
+                    return;
+                }
+                
+                try {
+                    // Get current PDF data
+                    const pdfData = await this.loadPDFData(this.currentBookId);
+                    if (!pdfData) {
+                        alert('PDF data not found. Please re-upload the PDF file.');
+                        return;
+                    }
+                    
+                    // Force download by calling offerFileDownload
+                    this.offerFileDownload(this.currentBookId, pdfData);
+                    
+                } catch (error) {
+                    console.error('Error downloading book data:', error);
+                    alert('Error creating backup file. Please try again.');
+                }
+            }
+            
+            loadStreakData() {
+                const savedData = localStorage.getItem('adhdReaderStreak');
+                if (savedData) {
+                    this.streakData = JSON.parse(savedData);
+                }
+                const today = new Date().toISOString().split('T')[0];
+                if (this.streakData.lastDate !== today) {
+                    if (this.streakData.lastDate) {
+                        const lastDate = new Date(this.streakData.lastDate);
+                        const diffDays = Math.floor((new Date(today) - lastDate) / (1000 * 60 * 60 * 24));
+                        if (diffDays > 1) {
+                            this.streakData.streak = 0;
+                        }
+                    }
+                    this.streakData.todayChunks = 0;
+                    this.streakData.lastDate = today;
+                    this.saveStreakData();
+                }
+            }
+            updateStreakData() {
+                const today = new Date().toISOString().split('T')[0];
+                if (this.streakData.lastDate !== today) {
+                    this.streakData.streak++;
+                    this.streakData.todayChunks = 0;
+                    this.streakData.lastDate = today;
+                }
+                this.streakData.todayChunks++;
+                this.saveStreakData();
+                this.updateStreakDisplay();
+            }
+            saveStreakData() {
+                localStorage.setItem('adhdReaderStreak', JSON.stringify(this.streakData));
+            }
+            updateStreakDisplay() {
+                document.getElementById('streak-count').textContent = this.streakData.streak;
+                document.getElementById('today-chunks').textContent = this.streakData.todayChunks;
+            }
+            startReminderCycle() {
+                this.reminderInterval = setInterval(() => {
+                    if (!this.remindersPaused) {
+                        const reminder = document.getElementById('reminder');
+                        const messages = [
+                            'Just one chunk. No pressure. 🌟',
+                            'You got this! One step at a time. 🚶',
+                            'Take a deep breath and read a bit! 😊',
+                            'Small chunks, big wins! 💪'
+                        ];
+                        reminder.textContent = messages[Math.floor(Math.random() * messages.length)];
+                    }
+                }, 30000);
+            }
+        }
+        const reader = new ADHDPDFReader();
+    </script>
+</body>
+</html>
