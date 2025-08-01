@@ -11,7 +11,6 @@ Versatile is not just a productivity tool — it's a *vibe*. Whether you're neur
 * 🔄 **Smooth Transitions & Responsive Layout** – Built with TailwindCSS for a seamless experience
 * 📱 **Mobile-Optimized** – Use it on the go, anywhere
 * 💾 **LocalStorage-Ready** – Save your task states without backend
-* 🛠️ **Lightweight & Fast** – Powered by Vite and optimized React structure
 * 🎯 **Clarity-Centric UI** – Designed to keep your focus where it matters
 
 ## 🧠 Ideal For
